@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        let cau = "xin chao cac ban den voi lop hoc JS";
+        let arr = cau.split("");
+        let stu = cau.length;
+        for (let i = 0;i<stu;i++){
+            if (i == 0 || cau[i-1]==" " ){
+                if (arr[i]>="a" && arr[i]<="z"){
+                    arr[i] = arr[i].toUpperCase();
+                }
+            }
+        }
+            
+    let ketQua = arr.join("");
+    console.log(ketQua);
+    </script>
+</body>
+</html>

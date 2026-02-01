@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // 1. Khai báo biến city (var) và age (let)
+      var city = "Hà Nội";
+      let age = 25;
+
+      // 2. Khai báo biến PI (const)
+      const PI = 3.14;
+
+      // 3. Khai báo các biến với giá trị thích hợp (tương ứng với các kiểu dữ liệu)
+      // Biến 'greeting' cần chứa chữ "Hello" để phục vụ cho yêu cầu số 4
+      let temperature = 36.5; // Kiểu Number
+      let greeting = "Hello JavaScript"; // Kiểu String
+      let isJavaScriptFun = true; // Kiểu Boolean
+      let nothing = null; // Kiểu Null
+      let notDefined; // Kiểu Undefined (khai báo nhưng không gán giá trị)
+      let uniqueID = Symbol("id"); // Kiểu Symbol
+      let numbers = [1, 2, 3, 4, 5]; // Kiểu Array (Object)
+      let person = {
+        // Kiểu Object
+        firstName: "Nguyen",
+        lastName: "A",
+      };
+
+      // 4. Xử lý chuỗi greeting
+      // In hoa toàn bộ chuỗi
+      let greetingUppercase = greeting.toUpperCase();
+
+      // Thay thế "Hello" bằng "Good afternoon"
+      let greetingReplaced = greeting.replace("Hello", "Good afternoon");
+
+      // --- Kiểm tra kết quả (Optional: in ra console để xem) ---
+      console.log("City:", city);
+      console.log("Age:", age);
+      console.log("Greeting Upper:", greetingUppercase); // Kết quả: HELLO JAVASCRIPT
+      console.log("Greeting Replaced:", greetingReplaced); // Kết quả: Good afternoon JavaScript
+    </script>
+  </body>
+</html>

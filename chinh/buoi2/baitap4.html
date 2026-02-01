@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+    // Khởi tạo chuỗi ban đầu
+    let thongDiep = "    hoc lap trinh voi js rat thu vi va bo ich    ";
+
+    // --- PHẦN 1: XỬ LÝ CHUỖI BAN ĐẦU ---
+    // 1. Loại bỏ khoảng trắng thừa ở đầu và cuối
+    let chuoiTrim = thongDiep.trim();
+
+    // 2. In ra độ dài chuỗi sau khi đã loại bỏ khoảng trắng
+    console.log("Độ dài chuỗi sau khi trim: " + chuoiTrim.length);
+
+    // 3. Tách chuỗi thành các từ dựa vào khoảng trắng " "
+    let mangTu = chuoiTrim.split(" ");
+
+
+    // --- PHẦN 2: PHÂN TÍCH NỘI DUNG ---
+    // 1. In ra số lượng từ trong chuỗi
+    let tongSoTu = mangTu.length;
+    console.log("Số lượng từ: " + tongSoTu);
+
+    // 2. Lấy từ đầu tiên, từ giữa và từ cuối cùng
+    let tuDau = mangTu[0];
+    let tuGiua = mangTu[Math.floor(tongSoTu / 2)];
+    let tuCuoi = mangTu[tongSoTu - 1];
+
+    console.log("Từ đầu tiên: " + tuDau);
+    console.log("Từ giữa: " + tuGiua);
+    console.log("Từ cuối: " + tuCuoi);
+
+    // 3. Tính tổng độ dài của từ đầu tiên và từ cuối cùng
+    let tongDoDaiDauCuoi = tuDau.length + tuCuoi.length;
+    console.log("Tổng độ dài từ đầu và cuối: " + tongDoDaiDauCuoi);
+
+
+    // --- PHẦN 3: TẠO BÁO CÁO CHUỖI ---
+    // Tạo chuỗi mới bằng toán tử +
+    let baoCao = "Thong diep bat dau bang " + tuDau + 
+                 ", ket thuc bang " + tuCuoi + 
+                 ", tong so tu la " + tongSoTu + ".";
+
+    console.log("Báo cáo: " + baoCao);
+</script>
+</body>
+</html>

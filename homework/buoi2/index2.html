@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // --- YÊU CẦU 1: Thao tác cơ bản với chuỗi ---
+      // Khai báo chuỗi
+      let text1 = "Học lập trình";
+      let text2 = "JavaScript";
+
+      // 1. Nối chuỗi (sử dụng toán tử +)
+      let fullText = text1 + " " + text2;
+      console.log("Chuỗi sau khi nối:", fullText);
+
+      // 2. Cắt chuỗi (substring): Lấy từ ký tự thứ 0 đến thứ 3
+      let subText = text2.substring(0, 4);
+      console.log("Chuỗi sau khi cắt (4 ký tự đầu):", subText); // Kết quả: Java
+
+      // 3. Tìm độ dài của chuỗi (.length)
+      let textLength = fullText.length;
+      console.log("Độ dài của chuỗi nối:", textLength);
+
+      // --- YÊU CẦU 2: Nhập chuỗi và in hoa ---
+      // Sử dụng prompt để nhận dữ liệu từ người dùng
+      let userInput = prompt("Mời bạn nhập vào một chuỗi bất kỳ:");
+
+      if (userInput) {
+        // Kiểm tra nếu người dùng có nhập
+        let upperCaseText = userInput.toUpperCase();
+        console.log("Chuỗi in hoa:", upperCaseText);
+        alert("Chuỗi in hoa là: " + upperCaseText);
+      }
+
+      // --- YÊU CẦU 3: In thông báo tên và tuổi ---
+      // Khai báo biến
+      let userName = "Minh"; // String
+      let userAge = 20; // Number
+
+      // In ra thông báo (Sử dụng Template Literal - dấu backtick ` để dễ chèn biến)
+      console.log(`Tên bạn là ${userName} và bạn ${userAge} tuổi.`);
+      // Hoặc cách nối chuỗi truyền thống:
+      // console.log("Tên bạn là " + userName + " và bạn " + userAge + " tuổi.");
+
+      // --- YÊU CẦU 4: Đếm số ký tự câu nhập vào ---
+      let sentence = prompt("Mời bạn nhập vào một câu để đếm ký tự:");
+
+      if (sentence) {
+        let count = sentence.length;
+        console.log(`Độ dài của câu bạn vừa nhập là: ${count} ký tự.`);
+        alert(`Câu của bạn dài ${count} ký tự.`);
+      }
+    </script>
+  </body>
+</html>

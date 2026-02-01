@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        let person = {
+            name : "Nguyen van a",
+            age : 18,
+            school : "a",
+        }
+        console.log(person.name)
+        console.log(person['age'])
+        for (let key in person){
+            console.log(key,'co gia tri la:',person[key])
+        }
+        person.gender = 'Nam'
+        person['fav'] = 'An com'
+        console.log(person)
+        if ('gender' in person)
+            console.log('co')
+        if (person.hasOwnProperty('gender'))
+            console.log('co')
+        delete person.age
+        console.log(person)
+    </script>
+</body>
+</html>

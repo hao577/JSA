@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Neon God: Evolution (Fixed)</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-color: #030305;
+        --neon-cyan: #00f3ff;
+        --neon-pink: #ff00ff;
+        --neon-gold: #ffd700;
+        --neon-green: #0aff00;
+        --glass: rgba(255, 255, 255, 0.05);
+        --grid-cols: 4;
+        --card-size: 90px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        background-color: var(--bg-color);
+        background-image:
+          radial-gradient(circle at 50% -20%, #2b1055 0%, transparent 60%),
+          linear-gradient(
+            0deg,
+            transparent 24%,
+            rgba(0, 243, 255, 0.03) 25%,
+            rgba(0, 243, 255, 0.03) 26%,
+            transparent 27%,
+            transparent 74%,
+            rgba(0, 243, 255, 0.03) 75%,
+            rgba(0, 243, 255, 0.03) 76%,
+            transparent 77%,
+            transparent
+          ),
+          linear-gradient(
+            90deg,
+            transparent 24%,
+            rgba(0, 243, 255, 0.03) 25%,
+            rgba(0, 243, 255, 0.03) 26%,
+            transparent 27%,
+            transparent 74%,
+            rgba(0, 243, 255, 0.03) 75%,
+            rgba(0, 243, 255, 0.03) 76%,
+            transparent 77%,
+            transparent
+          );
+        background-size:
+          100% 100%,
+          50px 50px,
+          50px 50px;
+        font-family: "Rajdhani", sans-serif;
+        color: #fff;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      /* --- HUD --- */
+      .hud {
+        display: flex;
+        gap: 15px;
+        width: 95%;
+        max-width: 800px;
+        justify-content: center;
+        margin-bottom: 20px;
+        z-index: 10;
+      }
+
+      .hud-box {
+        background: linear-gradient(
+          145deg,
+          rgba(255, 255, 255, 0.05) 0%,
+          rgba(0, 0, 0, 0.5) 100%
+        );
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 10px 20px;
+        min-width: 100px;
+        text-align: center;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hud-box::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        animation: shine 3s infinite;
+      }
+      @keyframes shine {
+        100% {
+          left: 200%;
+        }
+      }
+
+      .label {
+        font-size: 0.8rem;
+        color: var(--neon-cyan);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+      }
+      .value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+      }
+
+      /* Đã sửa ID selector cho đúng */
+      #ui-combo {
+        color: var(--neon-pink);
+        transition: 0.3s;
+      }
+      .combo-pulse {
+        animation: heartbeat 0.5s infinite alternate;
+        text-shadow: 0 0 20px var(--neon-pink);
+      }
+      @keyframes heartbeat {
+        to {
+          transform: scale(1.2);
+        }
+      }
+
+      .combo-bar-container {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        width: 100%;
+        background: #333;
+      }
+      .combo-bar {
+        height: 100%;
+        width: 0%;
+        background: var(--neon-pink);
+        box-shadow: 0 0 10px var(--neon-pink);
+      }
+
+      /* --- GRID --- */
+      .game-area {
+        position: relative;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow:
+          0 0 0 1px rgba(0, 0, 0, 1),
+          0 0 20px rgba(0, 243, 255, 0.2);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(var(--grid-cols), 1fr);
+        gap: 12px;
+        perspective: 1000px;
+      }
+
+      .card-slot {
+        width: var(--card-size);
+        height: var(--card-size);
+        position: relative;
+      }
+
+      .card {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        transform-style: preserve-3d;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+      }
+      .card.flipped {
+        transform: rotateY(180deg);
+      }
+
+      .card.vanished {
+        animation: implode 0.5s forwards;
+        pointer-events: none;
+      }
+      @keyframes implode {
+        0% {
+          transform: rotateY(180deg) scale(1);
+          filter: brightness(1);
+          opacity: 1;
+        }
+        50% {
+          transform: rotateY(180deg) scale(1.1);
+          filter: brightness(3);
+          box-shadow: 0 0 30px var(--neon-green);
+          opacity: 1;
+        }
+        100% {
+          transform: rotateY(180deg) scale(0);
+          filter: brightness(5);
+          opacity: 0;
+        }
+      }
+
+      .face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 12px;
+        backface-visibility: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: calc(var(--card-size) * 0.5);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+      }
+
+      .front {
+        background: linear-gradient(135deg, #1a1a2e 0%, #101018 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .front::after {
+        content: "";
+        width: 30%;
+        height: 30%;
+        border: 2px solid rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        transform: rotate(45deg);
+      }
+      .back {
+        transform: rotateY(180deg);
+        background: rgba(20, 20, 30, 0.95);
+        border: 2px solid var(--neon-cyan);
+        box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.3);
+      }
+
+      /* --- Overlays --- */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(3, 3, 5, 0.95);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        transition: 0.5s;
+      }
+      .hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .btn {
+        margin-top: 30px;
+        padding: 15px 40px;
+        background: transparent;
+        color: var(--neon-cyan);
+        border: 2px solid var(--neon-cyan);
+        font-family: "Rajdhani";
+        font-size: 1.5rem;
+        font-weight: bold;
+        letter-spacing: 2px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: 0.3s;
+        text-transform: uppercase;
+      }
+      .btn:hover {
+        background: var(--neon-cyan);
+        color: #000;
+        box-shadow: 0 0 40px var(--neon-cyan);
+      }
+
+      .level-text {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 5rem;
+        font-weight: 800;
+        color: transparent;
+        -webkit-text-stroke: 2px var(--neon-gold);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 50;
+      }
+      .level-anim {
+        animation: zoomText 2s ease forwards;
+      }
+      @keyframes zoomText {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(0.5);
+          filter: blur(10px);
+        }
+        50% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1.2);
+          filter: blur(0px);
+          text-shadow: 0 0 50px var(--neon-gold);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(2);
+        }
+      }
+
+      @media (max-width: 600px) {
+        .hud {
+          gap: 5px;
+        }
+        .hud-box {
+          padding: 5px 10px;
+          min-width: 70px;
+        }
+        .value {
+          font-size: 1.2rem;
+        }
+        .game-area {
+          padding: 10px;
+          width: 95%;
+        }
+        .grid {
+          gap: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="start-screen" class="overlay">
+      <h1
+        style="
+          font-size: 3.5rem;
+          color: var(--neon-cyan);
+          text-shadow: 0 0 30px var(--neon-cyan);
+        "
+      >
+        NEON EVOLUTION
+      </h1>
+      <p style="color: #888; letter-spacing: 3px">5 LEVELS CHALLENGE</p>
+      <button class="btn" onclick="game.init()">START GAME</button>
+    </div>
+
+    <div id="win-screen" class="overlay hidden">
+      <h1
+        style="
+          font-size: 4rem;
+          color: var(--neon-gold);
+          text-shadow: 0 0 50px var(--neon-gold);
+        "
+      >
+        GODLIKE!
+      </h1>
+      <p style="font-size: 1.5rem; margin-top: 10px">All Levels Completed</p>
+      <div style="margin-top: 20px; text-align: center; color: #ccc">
+        <p>
+          Score:
+          <span id="final-score" style="color: var(--neon-green)">0</span>
+        </p>
+        <p>
+          Best Combo:
+          <span id="final-combo" style="color: var(--neon-pink)">x0</span>
+        </p>
+      </div>
+      <button class="btn" onclick="game.init()">RESTART</button>
+    </div>
+
+    <div id="level-indicator" class="level-text">LEVEL 1</div>
+
+    <div class="hud">
+      <div class="hud-box">
+        <div class="label">LEVEL</div>
+        <div class="value" id="ui-level" style="color: var(--neon-gold)">
+          1/5
+        </div>
+      </div>
+      <div class="hud-box">
+        <div class="label">SCORE</div>
+        <div class="value" id="ui-score">0</div>
+      </div>
+      <div class="hud-box">
+        <div class="label">COMBO</div>
+        <div class="value" id="ui-combo">x1</div>
+        <div class="combo-bar-container">
+          <div class="combo-bar" id="combo-bar"></div>
+        </div>
+      </div>
+      <div class="hud-box">
+        <div class="label">TIME</div>
+        <div class="value" id="ui-time">00:00</div>
+      </div>
+    </div>
+
+    <div class="game-area">
+      <div class="grid" id="grid"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+      const LEVEL_CONFIG = [
+        { cols: 4, pairs: 6, size: 100 },
+        { cols: 4, pairs: 8, size: 85 },
+        { cols: 5, pairs: 10, size: 75 },
+        { cols: 6, pairs: 12, size: 65 },
+        { cols: 6, pairs: 15, size: 55 },
+      ];
+
+      // --- SỬA LỖI ÂM THANH: Khởi tạo an toàn ---
+      let audioCtx = null;
+
+      function playSfx(type) {
+        // Chỉ tạo AudioContext khi người chơi tương tác lần đầu
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === "suspended") audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === "flip") {
+          osc.frequency.setValueAtTime(300, now);
+          gain.gain.setValueAtTime(0.05, now);
+          osc.start(now);
+          osc.stop(now + 0.1);
+        } else if (type === "match") {
+          osc.frequency.setValueAtTime(500, now);
+          osc.frequency.linearRampToValueAtTime(1000, now + 0.2);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.linearRampToValueAtTime(0, now + 0.3);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        } else if (type === "win") {
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(400, now);
+          osc.frequency.linearRampToValueAtTime(800, now + 1);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.linearRampToValueAtTime(0, now + 1.5);
+          osc.start(now);
+          osc.stop(now + 1.5);
+        }
+      }
+
+      class Game {
+        constructor() {
+          this.icons = [
+            "⚡",
+            "🔥",
+            "❄️",
+            "⭐",
+            "🧬",
+            "🎲",
+            "💎",
+            "🚀",
+            "🔮",
+            "👽",
+            "💀",
+            "👻",
+            "🤖",
+            "👾",
+            "🐲",
+            "👑",
+          ];
+          this.level = 0;
+          this.score = 0;
+          this.combo = 1;
+          this.maxComboRec = 1;
+          this.seconds = 0;
+          this.timerInt = null;
+          this.comboTimer = null;
+          this.comboEndTime = 0;
+          this.comboAnimationFrame = null;
+          this.grid = document.getElementById("grid");
+          this.firstCard = null;
+          this.secondCard = null;
+          this.lockBoard = false;
+          this.matches = 0;
+        }
+
+        init() {
+          this.level = 0;
+          this.score = 0;
+          this.seconds = 0;
+          this.maxComboRec = 1;
+          this.combo = 1;
+          this.resetComboUI();
+
+          document.getElementById("start-screen").classList.add("hidden");
+          document.getElementById("win-screen").classList.add("hidden");
+
+          // Kích hoạt âm thanh ngay khi bấm Start để tránh lỗi về sau
+          playSfx("flip");
+
+          this.startTimer();
+          this.setupLevel();
+        }
+
+        setupLevel() {
+          this.grid.innerHTML = "";
+          this.firstCard = null;
+          this.secondCard = null;
+          this.lockBoard = false;
+          this.matches = 0;
+
+          const config = LEVEL_CONFIG[this.level];
+
+          document.documentElement.style.setProperty(
+            "--grid-cols",
+            config.cols,
+          );
+          const isMobile = window.innerWidth < 600;
+          document.documentElement.style.setProperty(
+            "--card-size",
+            (isMobile ? config.size * 0.7 : config.size) + "px",
+          );
+
+          document.getElementById("ui-level").innerText = `${this.level + 1}/5`;
+          document.getElementById("ui-score").innerText = this.score;
+
+          const levelIcons = [...this.icons]
+            .sort(() => 0.5 - Math.random())
+            .slice(0, config.pairs);
+          const deck = [...levelIcons, ...levelIcons].sort(
+            () => 0.5 - Math.random(),
+          );
+
+          deck.forEach((icon) => {
+            const slot = document.createElement("div");
+            slot.classList.add("card-slot");
+            const card = document.createElement("div");
+            card.classList.add("card");
+            card.dataset.icon = icon;
+            card.innerHTML = `<div class="face front"></div><div class="face back" style="color:${this.getColor(icon)}">${icon}</div>`;
+            card.onclick = () => this.flip(card);
+            slot.appendChild(card);
+            this.grid.appendChild(slot);
+          });
+
+          const indicator = document.getElementById("level-indicator");
+          indicator.innerText = `LEVEL ${this.level + 1}`;
+          indicator.classList.remove("level-anim");
+          void indicator.offsetWidth;
+          indicator.classList.add("level-anim");
+        }
+
+        getColor(icon) {
+          const colors = [
+            "#00f3ff",
+            "#ff00ff",
+            "#0aff00",
+            "#ffd700",
+            "#ff003c",
+          ];
+          return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        flip(card) {
+          if (
+            this.lockBoard ||
+            card === this.firstCard ||
+            card.classList.contains("flipped")
+          )
+            return;
+
+          playSfx("flip");
+          card.classList.add("flipped");
+
+          if (!this.firstCard) {
+            this.firstCard = card;
+          } else {
+            this.secondCard = card;
+            this.checkMatch();
+          }
+        }
+
+        checkMatch() {
+          const isMatch =
+            this.firstCard.dataset.icon === this.secondCard.dataset.icon;
+          isMatch ? this.handleMatch() : this.handleMiss();
+        }
+
+        handleMatch() {
+          playSfx("match");
+          this.lockBoard = true;
+
+          this.combo++;
+          if (this.combo > 5) this.combo = 5;
+          if (this.combo > this.maxComboRec) this.maxComboRec = this.combo;
+
+          this.score += 100 * this.combo;
+          document.getElementById("ui-score").innerText = this.score;
+
+          let comboDuration = 5000 + (this.combo - 2) * 1000;
+          if (this.combo < 2) comboDuration = 0;
+          if (comboDuration > 8000) comboDuration = 8000;
+
+          this.startComboTimer(comboDuration);
+          this.updateComboUI();
+
+          setTimeout(() => {
+            this.firstCard.classList.add("vanished");
+            this.secondCard.classList.add("vanished");
+            this.matches++;
+            this.resetBoard();
+
+            if (this.matches === LEVEL_CONFIG[this.level].pairs) {
+              this.finishLevel();
+            }
+          }, 400);
+        }
+
+        handleMiss() {
+          this.lockBoard = true;
+          this.combo = 1;
+          this.stopComboTimer();
+          this.updateComboUI();
+
+          setTimeout(() => {
+            this.firstCard.classList.remove("flipped");
+            this.secondCard.classList.remove("flipped");
+            this.resetBoard();
+          }, 800);
+        }
+
+        startComboTimer(duration) {
+          this.stopComboTimer();
+          const now = Date.now();
+          this.comboEndTime = now + duration;
+
+          const bar = document.getElementById("combo-bar");
+
+          const updateBar = () => {
+            const timeLeft = this.comboEndTime - Date.now();
+            if (timeLeft <= 0) {
+              this.combo = 1;
+              this.updateComboUI();
+              this.stopComboTimer();
+              return;
+            }
+            const pct = (timeLeft / duration) * 100;
+            bar.style.width = `${pct}%`;
+            this.comboAnimationFrame = requestAnimationFrame(updateBar);
+          };
+          this.comboAnimationFrame = requestAnimationFrame(updateBar);
+        }
+
+        stopComboTimer() {
+          if (this.comboAnimationFrame)
+            cancelAnimationFrame(this.comboAnimationFrame);
+          document.getElementById("combo-bar").style.width = "0%";
+        }
+
+        updateComboUI() {
+          const el = document.getElementById("ui-combo");
+          el.innerText = `x${this.combo}`;
+          if (this.combo > 1) el.classList.add("combo-pulse");
+          else el.classList.remove("combo-pulse");
+        }
+
+        resetComboUI() {
+          this.stopComboTimer();
+          this.updateComboUI();
+        }
+
+        resetBoard() {
+          [this.firstCard, this.secondCard, this.lockBoard] = [
+            null,
+            null,
+            false,
+          ];
+        }
+
+        finishLevel() {
+          this.stopComboTimer();
+          if (this.level < LEVEL_CONFIG.length - 1) {
+            playSfx("win");
+            setTimeout(() => {
+              this.level++;
+              this.setupLevel();
+            }, 1500);
+          } else {
+            this.gameOver();
+          }
+        }
+
+        gameOver() {
+          clearInterval(this.timerInt);
+          playSfx("win");
+          if (window.confetti)
+            confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+
+          document.getElementById("final-score").innerText = this.score;
+          document.getElementById("final-combo").innerText =
+            `x${this.maxComboRec}`;
+          setTimeout(() => {
+            document.getElementById("win-screen").classList.remove("hidden");
+          }, 1000);
+        }
+
+        startTimer() {
+          this.timerInt = setInterval(() => {
+            this.seconds++;
+            const m = Math.floor(this.seconds / 60)
+              .toString()
+              .padStart(2, "0");
+            const s = (this.seconds % 60).toString().padStart(2, "0");
+            document.getElementById("ui-time").innerText = `${m}:${s}`;
+          }, 1000);
+        }
+      }
+
+      const game = new Game();
+    </script>
+  </body>
+</html>

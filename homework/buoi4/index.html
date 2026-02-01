@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // --- PHẦN 1: THAO TÁC VỚI MẢNG (ARRAY) ---
+
+      // 1. Tạo một mảng các user objects, mỗi object có id và tên
+      let users = [
+        { id: 1, name: "Nguyễn Văn A" },
+        { id: 2, name: "Trần Thị B" },
+        { id: 3, name: "Lê Văn C" },
+      ];
+      console.log("Danh sách ban đầu:", users);
+
+      // 2. Thêm một object mới vào mảng
+      function addUser(id, name) {
+        const newUser = { id: id, name: name };
+        users.push(newUser);
+      }
+      addUser(4, "Phạm Văn D");
+      console.log("Sau khi thêm user mới:", users);
+
+      // 3. Cập nhật tên của một user dựa trên id của họ
+      function updateUserName(id, newName) {
+        // Tìm user có id tương ứng
+        const userIndex = users.findIndex((user) => user.id === id);
+
+        if (userIndex !== -1) {
+          users[userIndex].name = newName;
+        } else {
+          console.log(`Không tìm thấy user có id: ${id}`);
+        }
+      }
+      updateUserName(2, "Trần Thị B (Đã cập nhật)");
+      console.log("Sau khi cập nhật tên user id 2:", users);
+
+      // 4. Xóa một user khỏi mảng dựa trên id
+      function deleteUser(id) {
+        // Lọc ra các user có id KHÁC với id cần xóa
+        users = users.filter((user) => user.id !== id);
+      }
+      deleteUser(1); // Xóa user có id là 1
+      console.log("Sau khi xóa user id 1:", users);
+
+      // --- PHẦN 2: THAO TÁC VỚI ĐỐI TƯỢNG (OBJECT) ---
+
+      // 5. Tạo một đối tượng đại diện cho một người (tên, tuổi, thành phố)
+      let person = {
+        name: "Hoàng Văn Nam",
+        age: 25,
+        city: "Hồ Chí Minh",
+      };
+      console.log("Object Person ban đầu:", person);
+
+      // 6. Thêm thuộc tính email vào object
+      person.email = "nam.hoang@example.com";
+      console.log("Sau khi thêm email:", person);
+
+      // 7. Xóa thuộc tính tuổi (age)
+      delete person.age;
+      console.log("Sau khi xóa tuổi:", person);
+    </script>
+  </body>
+</html>

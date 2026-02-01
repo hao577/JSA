@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+            let hs = [
+                {ten:'An',tuoi:15,lop:'10A1'},
+                {ten:'Binh',tuoi:16,lop:'11A2'},
+                {ten:'Chau',tuoi:15,lop:'10A1'},
+            ]
+        hs.push({ten:'Dung',tuoi:17,lop:'11A3'})
+        for (let i = 0;i<hs.length;i++){
+                 console.log(hs[i].ten)
+                 if (hs[i].ten==='Binh')
+                    hs[i].tuoi = 17;
+                if (hs[i].ten === 'Chau'){
+                    hs.splice(i,1);
+                }        
+        }
+        console.log(hs)
+
+           
+       
+        
+    </script>
+</body>
+</html>

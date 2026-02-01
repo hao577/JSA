@@ -1,0 +1,93 @@
+:root {
+    --primary: #6c5ce7;
+    --bg: #dfe6e9;
+    --white: #ffffff;
+    --text: #2d3436;
+    --danger: #ff7675;
+}
+
+body {
+    background-color: var(--bg);
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    padding-top: 50px;
+}
+
+.container {
+    background: var(--white);
+    width: 400px;
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+h1 { margin: 0; color: var(--primary); }
+#stats { color: #b2bec3; font-size: 0.9rem; margin-bottom: 20px; }
+
+.input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    outline: none;
+    transition: 0.3s;
+}
+
+input:focus { border-color: var(--primary); }
+
+button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4); }
+
+/* Task List Styling */
+ul { list-style: none; padding: 0; }
+
+li {
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    animation: slideIn 0.3s ease;
+}
+
+li.completed span {
+    text-decoration: line-through;
+    color: #b2bec3;
+}
+
+.actions button {
+    padding: 5px 10px;
+    margin-left: 5px;
+    font-size: 0.8rem;
+}
+
+.btn-delete { background: var(--danger); }
+.btn-edit { background: #fab1a0; }
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.filters { display: flex; gap: 15px; margin-bottom: 15px; cursor: pointer; color: #b2bec3; }
+.filters span.active { color: var(--primary); font-weight: bold; border-bottom: 2px solid var(--primary); }     

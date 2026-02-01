@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        function tinhtong(n){
+            let tong = 0;
+            for (let i = 1;i<=n;i++) {
+                tong+=i;
+            }
+            return tong;
+        }
+        let n = prompt();
+        let result = tinhtong(n);
+        console.log(result)
+        function sayhello(name){
+            console.log("Xin chao: ",name)
+        }
+        sayhello('Cong')
+        sayhello('Quang')
+        function ktsonguyento(m){
+            if (n<2)
+                return false;
+            for (let i = 2;i<=Math.sqrt(m);i++)
+                if (m%i==0)
+                    return false;
+            return true;
+        }
+        let m = prompt()
+        if (ktsonguyento(m))
+            console.log(m, "la so nguyen to")
+        else
+            console.log(m,'khong phai la snt')
+        
+        function giaithua(k){
+            let tich = 1
+            for (let i = k;i>0;i--)
+                tich*=i;
+            return tich
+        }
+        let k = prompt()
+        console.log(giaithua(k))
+        let j = prompt()
+        console.log((j*1.8)+32)
+    </script>
+</body>
+</html>

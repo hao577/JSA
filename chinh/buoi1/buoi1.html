@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài học về Grid Display</title>
+    <style>
+        div {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-template-rows: repeat(2, 100px);
+            gap: 10px;
+        }
+        .Item {
+            background-color: lightblue;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div class="Item">1</div>
+        <div class="Item">2</div>
+        <div class="Item">3</div>
+        <div class="Item">4</div>
+        <div class="Item">5</div>
+        <div class="Item">6</div>
+        <div class="Item">7</div>
+        <div class="Item">8</div>
+    </div>
+</body>
+</html>

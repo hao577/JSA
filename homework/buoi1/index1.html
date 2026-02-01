@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài học về Grid Display</title>
+    <style>      
+        div {
+            display: grid;
+            grid-template-columns: repeat(3, 300px);
+             grid-template-rows: repeat(3, 80px);
+            gap : 20px;
+        }
+        .Item {
+            background-color: #AEC6FF;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            border-radius: 10px;
+
+        }
+        .Item1 {
+            grid-column-start: 1;
+            grid-column-end: 3;
+        }
+        .Item2 {
+            grid-column-start: 3;
+            grid-column-end: 3;
+        }
+        .Item3 {
+            grid-column-start: 1;
+            grid-column-end: 4;
+        }
+    </style>
+</head>
+<body>
+       <div>
+        <div class="Item Item1">Item 1</div>
+        <div class="Item Item2">Item 2</div>
+        <div class="Item Item3">Item 3</div>
+    </div>
+</body>
+</html>

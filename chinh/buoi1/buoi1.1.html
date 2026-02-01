@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài học về Grid Display</title>
+    <style>      
+        div {
+            display: grid;
+             grid-template-columns: repeat(7, 80px);
+             grid-template-rows: repeat(7, 80px);
+        }
+        .Item {
+            background-color: lightblue;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            border: 1px solid #000;
+        }
+        .Item1 {
+            grid-row-start: 1;
+            grid-row-end: 4;
+            background-color: lightcoral;
+        }
+        .Item2 {
+            grid-column-start: 2;
+            grid-column-end: 4;
+            grid-row-start: 1;
+            grid-row-end: 4;
+            background-color: lightseagreen;
+        }
+        .Item3 {
+            grid-column-start: 4;
+            grid-column-end: 7;
+            grid-row-start: 1;
+            grid-row-end: 3;
+            background-color: lightgoldenrodyellow;
+        }
+        .Item6{
+            grid-column-start: 4;
+            grid-column-end: 7;
+            background-color: lightsalmon;
+        }
+        .Item8{
+            grid-column-start: 1;
+            grid-column-end: 3;
+            grid-row-start: 4;
+            grid-row-end: 8;
+            background-color: lightpink;
+        }
+        .Item9{
+            grid-column-start: 3;
+            grid-column-end: 5;
+            grid-row-start: 4;
+            grid-row-end: 7;
+            background-color: lightgray;
+        }
+        
+        .Item10{
+            grid-column-start: 5;
+            grid-column-end: 8;
+            background-color: lightyellow;
+        }
+        .Item14{
+            grid-column-start: 5;
+            grid-column-end: 8;
+            grid-row-start: 5;
+            grid-row-end: 8;
+            background-color: lightyellow;
+        }
+        .Item16{
+            grid-column-start: 3;
+            grid-column-end: 5;
+            grid-row-start: 7;
+            grid-row-end: 8;
+            background-color: lightgreen;
+        }
+        .Item25{
+            grid-column-start: 5;
+            grid-column-end: 8;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div class="Item Item1">1</div>
+        <div class="Item Item2">2</div>
+        <div class="Item Item3">3</div>
+        <div class="Item Item4">4</div>
+        <div class="Item Item5">5</div>
+        <div class="Item Item6">6</div>
+        <div class="Item Item7">7</div>
+        <div class="Item Item8">8</div>
+        <div class="Item Item9">9</div>
+        <div class="Item Item10">10</div>
+        <div class="Item Item14">14</div>
+        <div class="Item Item16">16</div>
+
+        <div class="Item Item25">25</div>
+        <div class="Item Item26">26</div>
+    </div>
+        
+</body>
+</html>

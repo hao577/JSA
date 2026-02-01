@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MINDX 11 - THE FINAL UPGRADE</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Quicksand:wght@300;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --neon-blue: #00f2ff;
+        --neon-pink: #ff00ea;
+        --matrix-green: #00ff41;
+        --glass: rgba(255, 255, 255, 0.05);
+        --neon-yellow: #ffff00;
+        --neon-purple: #a200ff;
+        --neon-green: #00ff00;
+        --neon-orange: #ff6600;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #000;
+        color: #fff;
+        font-family: "Quicksand", sans-serif;
+        overflow: hidden;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #matrix-canvas {
+        opacity: 0.15;
+        z-index: 1;
+      }
+      #fireworks-canvas {
+        z-index: 2;
+        pointer-events: none;
+      }
+      #particle-canvas {
+        z-index: 3;
+        pointer-events: none;
+        opacity: 0.8;
+      }
+
+      /* UI Layer */
+      .viewport {
+        position: relative;
+        z-index: 10;
+        width: 90%;
+        max-width: 800px;
+        perspective: 1000px;
+      }
+
+      .ultimate-card {
+        background: var(--glass);
+        backdrop-filter: blur(30px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 40px;
+        padding: 60px 40px;
+        text-align: center;
+        box-shadow: 0 0 50px rgba(0, 0, 0, 1);
+        transform-style: preserve-3d;
+        transition: all 0.3s ease-out;
+        overflow-y: auto;
+        max-height: 90vh;
+      }
+
+      h1 {
+        font-family: "Orbitron", sans-serif;
+        font-size: 4rem;
+        font-weight: 900;
+        margin-bottom: 10px;
+        background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 10px var(--neon-blue));
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .age-container {
+        font-size: 7rem;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 900;
+        position: relative;
+        display: inline-block;
+        margin: 20px 0;
+        line-height: 1;
+      }
+
+      .age-glow {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        color: var(--neon-blue);
+        filter: blur(20px);
+        opacity: 0.7;
+        z-index: -1;
+        animation: glow 1.5s infinite alternate;
+      }
+
+      @keyframes glow {
+        from {
+          filter: blur(20px);
+          opacity: 0.7;
+        }
+        to {
+          filter: blur(30px);
+          opacity: 1;
+        }
+      }
+
+      .quote-box {
+        min-height: 80px;
+        margin: 20px 0;
+        font-style: italic;
+        font-size: 1.2rem;
+        color: #ccc;
+        transition: opacity 0.5s ease;
+      }
+
+      /* Replaced Timeline with Wishes */
+      .wishes {
+        margin: 40px 0;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 20px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .wish-item {
+        margin-bottom: 15px;
+        font-size: 1rem;
+        color: var(--neon-orange);
+        padding: 10px;
+        border-left: 4px solid var(--neon-purple);
+        animation: fadeIn 0.5s ease-in;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* New Features: Gallery with Lightbox */
+      .gallery {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 20px 0;
+        flex-wrap: wrap;
+      }
+
+      .gallery img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 10px;
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+      }
+
+      .gallery img:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 20px var(--neon-blue);
+      }
+
+      /* Control Panel */
+      .controls {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 40px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        background: none;
+        border: 2px solid #fff;
+        color: #fff;
+        padding: 15px 30px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        transition: 0.3s;
+      }
+
+      .btn-primary {
+        border-color: var(--neon-blue);
+        color: var(--neon-blue);
+        box-shadow: 0 0 15px var(--neon-blue);
+      }
+      .btn-primary:hover {
+        background: var(--neon-blue);
+        color: #000;
+      }
+
+      .btn-secondary {
+        border-color: var(--neon-pink);
+        color: var(--neon-pink);
+        box-shadow: 0 0 15px var(--neon-pink);
+      }
+      .btn-secondary:hover {
+        background: var(--neon-pink);
+        color: #000;
+      }
+
+      .btn-tertiary {
+        border-color: var(--neon-purple);
+        color: var(--neon-purple);
+        box-shadow: 0 0 15px var(--neon-purple);
+      }
+      .btn-tertiary:hover {
+        background: var(--neon-purple);
+        color: #000;
+      }
+
+      .btn-quaternary {
+        border-color: var(--neon-green);
+        color: var(--neon-green);
+        box-shadow: 0 0 15px var(--neon-green);
+      }
+      .btn-quaternary:hover {
+        background: var(--neon-green);
+        color: #000;
+      }
+
+      .btn-quinary {
+        border-color: var(--neon-orange);
+        color: var(--neon-orange);
+        box-shadow: 0 0 15px var(--neon-orange);
+      }
+      .btn-quinary:hover {
+        background: var(--neon-orange);
+        color: #000;
+      }
+
+      /* Audio Visualizer */
+      #visualizer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 150px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 3px;
+        z-index: 5;
+        opacity: 0.6;
+      }
+      .bar {
+        width: 5px;
+        background: linear-gradient(to top, var(--neon-pink), var(--neon-blue));
+        border-radius: 3px;
+        transition: height 0.1s;
+      }
+
+      /* Modal for User Input */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 20;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background: var(--glass);
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        width: 80%;
+        max-width: 400px;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid var(--neon-blue);
+        background: transparent;
+        color: #fff;
+        border-radius: 5px;
+      }
+
+      /* Lightbox for Gallery */
+      #lightbox {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 25;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #lightbox img {
+        max-width: 80%;
+        max-height: 80%;
+        border-radius: 10px;
+        box-shadow: 0 0 30px var(--neon-pink);
+      }
+
+      #close-lightbox {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 2rem;
+        color: #fff;
+        cursor: pointer;
+      }
+
+      /* New: Progress Bar for Innovation Years */
+      .progress-container {
+        margin: 20px 0;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .progress-bar {
+        width: 0;
+        height: 20px;
+        background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+        animation: progress 2s ease-in-out forwards;
+      }
+
+      @keyframes progress {
+        to {
+          width: 100%;
+        }
+      }
+
+      /* New: Share Buttons */
+      .share-buttons {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+      }
+
+      .share-btn {
+        color: #fff;
+        text-decoration: none;
+        padding: 10px 20px;
+        border: 1px solid var(--neon-yellow);
+        border-radius: 5px;
+        transition: 0.3s;
+      }
+
+      .share-btn:hover {
+        background: var(--neon-yellow);
+        color: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="matrix-canvas"></canvas>
+    <canvas id="fireworks-canvas"></canvas>
+    <canvas id="particle-canvas"></canvas>
+
+    <div id="visualizer"></div>
+
+    <div class="viewport">
+      <div class="ultimate-card" id="card">
+        <h1>MINDX</h1>
+        <div class="age-container">
+          11
+          <div class="age-glow">11</div>
+        </div>
+        <p
+          style="
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+            color: var(--neon-blue);
+          "
+        >
+          YEARS OF INNOVATION
+        </p>
+
+        <!-- New: Progress Bar -->
+        <div class="progress-container">
+          <div class="progress-bar"></div>
+        </div>
+
+        <div class="quote-box" id="quote">
+          "Chào mừng bạn đến với tương lai của công nghệ!"
+        </div>
+
+        <!-- Replaced: Wishes Section -->
+        <div class="wishes" id="wishes-list">
+          <h3 style="color: var(--neon-purple)">Lời Chúc MindX</h3>
+          <div class="wish-item">
+            Chúc MindX tiếp tục dẫn dắt thế hệ trẻ vào thế giới công nghệ!
+          </div>
+          <div class="wish-item">
+            11 năm rực rỡ, tương lai còn sáng hơn nữa!
+          </div>
+          <div class="wish-item">
+            Cảm ơn MindX vì đã chắp cánh giấc mơ coder cho hàng ngàn bạn trẻ.
+          </div>
+          <div class="wish-item">
+            Chúc MindX mãi là ngọn hải đăng trong lĩnh vực giáo dục công nghệ.
+          </div>
+          <div class="wish-item">
+            Happy 11th Anniversary, MindX! Keep innovating!
+          </div>
+        </div>
+
+        <!-- Gallery with more images -->
+
+        <div class="controls">
+          <button class="btn btn-primary" onclick="initExperience()">
+            BẮT ĐẦU LỄ HỘI 🎉
+          </button>
+          <button class="btn btn-secondary" onclick="toggleTheme()">
+            THAY ĐỔI CHỦ ĐỀ
+          </button>
+          <button class="btn btn-tertiary" onclick="openModal()">
+            THÊM LỜI CHÚC
+          </button>
+          <button class="btn btn-quaternary" onclick="toggleMusic()">
+            TẠM DỪNG NHẠC
+          </button>
+          <button class="btn btn-quinary" onclick="fullScreen()">
+            TOÀN MÀN HÌNH
+          </button>
+        </div>
+
+        <!-- User Messages integrated into wishes -->
+        <div id="user-messages" style="display: none"></div>
+
+        <!-- New: Share Buttons -->
+        <div class="share-buttons">
+          <a
+            href="https://twitter.com/intent/tweet?text=Chúc%20mừng%20MindX%2011%20năm!&url=https://example.com"
+            class="share-btn"
+            >Chia sẻ trên X</a
+          >
+          <a
+            href="https://www.facebook.com/sharer/sharer.php?u=https://example.com"
+            class="share-btn"
+            >Chia sẻ trên Facebook</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Wish Modal -->
+    <div class="modal" id="wish-modal">
+      <div class="modal-content">
+        <h2>Thêm Lời Chúc Của Bạn</h2>
+        <input type="text" id="user-wish" placeholder="Nhập lời chúc..." />
+        <button class="btn btn-primary" onclick="submitWish()">GỬI</button>
+        <button class="btn btn-secondary" onclick="closeModal()">ĐÓNG</button>
+      </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div id="lightbox" onclick="closeLightbox()">
+      <span id="close-lightbox" onclick="closeLightbox()">×</span>
+      <img id="lightbox-img" src="" />
+    </div>
+
+    <audio id="audio" loop crossorigin="anonymous">
+      <source
+        src="happy-birthday-357371.mp3"
+        type="audio/mpeg"
+      />
+    </audio>
+
+    <script>
+      // Matrix Background
+      const mCanvas = document.getElementById("matrix-canvas");
+      const mCtx = mCanvas.getContext("2d");
+      let columns;
+      const characters = "MINDX010101TECHFUTUREINNOVATIONAIFUTURE";
+      let drops = [];
+      let matrixSpeed = 50;
+
+      function initMatrix() {
+        mCanvas.width = window.innerWidth;
+        mCanvas.height = window.innerHeight;
+        columns = mCanvas.width / 20;
+        drops = Array(Math.floor(columns)).fill(1);
+      }
+
+      function drawMatrix() {
+        mCtx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        mCtx.fillRect(0, 0, mCanvas.width, mCanvas.height);
+        mCtx.fillStyle = "#0F0";
+        mCtx.font = "15px monospace";
+        for (let i = 0; i < drops.length; i++) {
+          const text =
+            characters[Math.floor(Math.random() * characters.length)];
+          mCtx.fillText(text, i * 20, drops[i] * 20);
+          if (drops[i] * 20 > mCanvas.height && Math.random() > 0.975)
+            drops[i] = 0;
+          drops[i]++;
+        }
+      }
+
+      // Quote System
+      const quotes = [
+        "Code for Change - Sáng tạo để thay đổi thế giới.",
+        "11 năm - Hàng vạn giấc mơ công nghệ được chắp cánh.",
+        "Tương lai thuộc về những người biết lập trình nó.",
+        "MindX: Nơi những dòng code trở thành phép màu.",
+        "Keep coding, keep dreaming, keep growing!",
+        "AI sẽ thay đổi thế giới, nhưng MindX thay đổi bạn trước.",
+        "Từ ý tưởng đến sản phẩm: MindX dẫn lối.",
+        "11 năm sáng tạo không ngừng nghỉ.",
+        "Học code hôm nay, dẫn dắt tương lai mai sau.",
+        "MindX: Nơi đam mê gặp gỡ công nghệ.",
+        "Innovation never stops at MindX.",
+        "Building the future, one line of code at a time.",
+      ];
+
+      function changeQuote() {
+        const qBox = document.getElementById("quote");
+        qBox.style.opacity = 0;
+        setTimeout(() => {
+          qBox.innerText = quotes[Math.floor(Math.random() * quotes.length)];
+          qBox.style.opacity = 1;
+        }, 500);
+      }
+
+      // Audio Visualizer
+      let audioContext;
+      let analyser;
+      let dataArray;
+      let bars;
+      let audioPlaying = false;
+
+      function startVisualizer() {
+        const audio = document.getElementById("audio");
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const src = audioContext.createMediaElementSource(audio);
+        analyser = audioContext.createAnalyser();
+        src.connect(analyser);
+        analyser.connect(audioContext.destination);
+        analyser.fftSize = 128;
+        const bufferLength = analyser.frequencyBinCount;
+        dataArray = new Uint8Array(bufferLength);
+
+        const vContainer = document.getElementById("visualizer");
+        vContainer.innerHTML = "";
+        for (let i = 0; i < bufferLength; i++) {
+          const bar = document.createElement("div");
+          bar.className = "bar";
+          vContainer.appendChild(bar);
+        }
+        bars = document.getElementsByClassName("bar");
+
+        function renderFrame() {
+          analyser.getByteFrequencyData(dataArray);
+          for (let i = 0; i < bufferLength; i++) {
+            const h = dataArray[i] * 1.8;
+            bars[i].style.height = h + "px";
+          }
+          requestAnimationFrame(renderFrame);
+        }
+        renderFrame();
+      }
+
+      // Firework
+      const fCanvas = document.getElementById("fireworks-canvas");
+      const fCtx = fCanvas.getContext("2d");
+      let particles = [];
+
+      class Particle {
+        constructor(x, y, color) {
+          this.x = x;
+          this.y = y;
+          this.color = color;
+          this.velocity = {
+            x: (Math.random() - 0.5) * 12,
+            y: (Math.random() - 0.5) * 12,
+          };
+          this.alpha = 1;
+          this.friction = 0.96;
+          this.size = Math.random() * 3 + 2;
+        }
+        draw() {
+          fCtx.save();
+          fCtx.globalAlpha = this.alpha;
+          fCtx.beginPath();
+          fCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          fCtx.fillStyle = this.color;
+          fCtx.fill();
+          fCtx.restore();
+        }
+        update() {
+          this.velocity.x *= this.friction;
+          this.velocity.y *= this.friction;
+          this.x += this.velocity.x;
+          this.y += this.velocity.y;
+          this.alpha -= 0.008;
+        }
+      }
+
+      function createFirework(x, y) {
+        const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        for (let i = 0; i < 80; i++) particles.push(new Particle(x, y, color));
+      }
+
+      function animateFireworks() {
+        fCtx.fillStyle = "rgba(0,0,0,0.05)";
+        fCtx.fillRect(0, 0, fCanvas.width, fCanvas.height);
+        particles.forEach((p, i) => {
+          if (p.alpha <= 0) particles.splice(i, 1);
+          else {
+            p.update();
+            p.draw();
+          }
+        });
+        requestAnimationFrame(animateFireworks);
+      }
+
+      // Confetti Particles
+      const pCanvas = document.getElementById("particle-canvas");
+      const pCtx = pCanvas.getContext("2d");
+      let confetti = [];
+
+      class Confetti {
+        constructor() {
+          this.x = Math.random() * pCanvas.width;
+          this.y = Math.random() * pCanvas.height;
+          this.color = `hsl(${Math.random() * 360}, 100%, 70%)`;
+          this.velocity = {
+            x: (Math.random() - 0.5) * 2,
+            y: Math.random() * 2 + 1,
+          };
+          this.alpha = 1;
+        }
+        draw() {
+          pCtx.save();
+          pCtx.globalAlpha = this.alpha;
+          pCtx.beginPath();
+          pCtx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+          pCtx.fillStyle = this.color;
+          pCtx.fill();
+          pCtx.restore();
+        }
+        update() {
+          this.x += this.velocity.x;
+          this.y += this.velocity.y;
+          if (this.y > pCanvas.height) this.y = 0;
+          this.alpha = Math.random() * 0.5 + 0.5;
+        }
+      }
+
+      function initConfetti() {
+        for (let i = 0; i < 150; i++) confetti.push(new Confetti()); // Tăng số lượng
+      }
+
+      function animateConfetti() {
+        pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+        confetti.forEach((p) => {
+          p.update();
+          p.draw();
+        });
+        requestAnimationFrame(animateConfetti);
+      }
+
+      // Theme Toggle with more themes
+      let currentTheme = 0;
+      const themes = [
+        { blue: "#00f2ff", pink: "#ff00ea" },
+        { blue: "#ffff00", pink: "#00ff41" },
+        { blue: "#ff6600", pink: "#a200ff" },
+      ];
+
+      function toggleTheme() {
+        currentTheme = (currentTheme + 1) % themes.length;
+        const theme = themes[currentTheme];
+        document.documentElement.style.setProperty("--neon-blue", theme.blue);
+        document.documentElement.style.setProperty("--neon-pink", theme.pink);
+      }
+
+      // Wish Modal
+      function openModal() {
+        document.getElementById("wish-modal").style.display = "flex";
+      }
+
+      function closeModal() {
+        document.getElementById("wish-modal").style.display = "none";
+      }
+
+      function submitWish() {
+        const wish = document.getElementById("user-wish").value;
+        if (wish) {
+          const wishesList = document.getElementById("wishes-list");
+          const newWish = document.createElement("div");
+          newWish.className = "wish-item";
+          newWish.innerText = wish;
+          wishesList.appendChild(newWish);
+          document.getElementById("user-wish").value = "";
+          closeModal();
+          createFirework(window.innerWidth / 2, window.innerHeight / 2); // Firework on submit
+          saveWishes(); // Save to localStorage
+        }
+      }
+
+      // LocalStorage for Wishes
+      function saveWishes() {
+        const wishesList = document.getElementById("wishes-list");
+        const wishes = Array.from(
+          wishesList.querySelectorAll(".wish-item")
+        ).map((item) => item.innerText);
+        localStorage.setItem("mindxWishes", JSON.stringify(wishes));
+      }
+
+      function loadWishes() {
+        const savedWishes = localStorage.getItem("mindxWishes");
+        if (savedWishes) {
+          const wishes = JSON.parse(savedWishes);
+          const wishesList = document.getElementById("wishes-list");
+          wishesList.innerHTML =
+            '<h3 style="color: var(--neon-purple);">Lời Chúc MindX</h3>';
+          wishes.forEach((w) => {
+            const newWish = document.createElement("div");
+            newWish.className = "wish-item";
+            newWish.innerText = w;
+            wishesList.appendChild(newWish);
+          });
+        }
+      }
+
+      // Toggle Music
+      function toggleMusic() {
+        const audio = document.getElementById("audio");
+        if (audioPlaying) {
+          audio.pause();
+          audioPlaying = false;
+          this.innerText = "PHÁT NHẠC";
+        } else {
+          audio.play();
+          audioPlaying = true;
+          this.innerText = "TẠM DỪNG NHẠC";
+        }
+      }
+
+      // Full Screen
+      function fullScreen() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen();
+        } else {
+          document.exitFullscreen();
+        }
+      }
+
+      // Lightbox
+      function openLightbox(src) {
+        document.getElementById("lightbox-img").src = src;
+        document.getElementById("lightbox").style.display = "flex";
+      }
+
+      function closeLightbox() {
+        document.getElementById("lightbox").style.display = "none";
+      }
+
+      // Global Init
+      function initExperience() {
+        const audio = document.getElementById("audio");
+        audio.play();
+        audioPlaying = true;
+        startVisualizer();
+        setInterval(changeQuote, 3000);
+        setInterval(
+          () =>
+            createFirework(
+              Math.random() * fCanvas.width,
+              Math.random() * fCanvas.height
+            ),
+          400
+        ); // Tăng tần suất
+        initConfetti();
+        animateConfetti();
+      }
+
+      // Setup
+      window.onload = () => {
+        initMatrix();
+        setInterval(drawMatrix, matrixSpeed);
+        animateFireworks();
+        fCanvas.width = window.innerWidth;
+        fCanvas.height = window.innerHeight;
+        pCanvas.width = window.innerWidth;
+        pCanvas.height = window.innerHeight;
+        loadWishes();
+      };
+
+      document.addEventListener("mousemove", (e) => {
+        const x = (window.innerWidth / 2 - e.pageX) / 30;
+        const y = (window.innerHeight / 2 - e.pageY) / 30;
+        document.getElementById(
+          "card"
+        ).style.transform = `rotateY(${-x}deg) rotateX(${y}deg)`;
+      });
+
+      window.addEventListener("resize", () => {
+        mCanvas.width = window.innerWidth;
+        mCanvas.height = window.innerHeight;
+        fCanvas.width = window.innerWidth;
+        fCanvas.height = window.innerHeight;
+        pCanvas.width = window.innerWidth;
+        pCanvas.height = window.innerHeight;
+        initMatrix();
+      });
+
+      // Keyboard Shortcuts
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "f") fullScreen();
+        if (e.key === "m") toggleMusic();
+      });
+    </script>
+  </body>
+</html>

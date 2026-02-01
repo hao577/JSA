@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toán tử so sánh</title>
+</head>
+<body>
+    <script>
+        let gtri = "12";
+        let gtri2 = "12";
+        console.log("Kết quả so sánh bằng (==): " + (gtri == gtri2));
+        console.log("Kết quả so sánh bằng nghiêm ngặt (===): " + (gtri === gtri2));
+        console.log("Kết quả so sánh khác nghiêm ngặt (!=): " + (gtri !== gtri2));
+        let gtri3 = true;
+        let gtri4 = false;
+        console.log(gtri3 && gtri4)
+        console.log(gtri3||gtri4)
+        console.log(!gtri3)
+        let temp = 25;
+        if (temp >25){
+            console.log("Nhiet do kha nong")
+
+        }
+        else if(temp>10){
+            console.log("Nhiet do hoi lanh")
+        }
+        else{
+            console.log("Lanh vai")
+        }
+        let scoop = 10;
+        if (scoop >=5){
+            console.log("An nhanh len, kem sap tan chay")
+        }
+        else if(scoop == 3){
+            console.log("kem sap het")
+        }
+        else if(scoop == 2){
+            console.log("Lan mot")
+        }
+        else if (scoop == 1){
+            console.log("Lan hai")
+
+        }
+        else if (scoop == 0){
+            console.log("Het roi")
+        }
+        else{
+            console.log("Van con nhieu kem,hay den lay them")
+        }
+        for (let i = 1;i<=50;i++)
+            console.log(i)
+        
+        let i = 50;
+        while (i>=0){
+            console.log(i)
+            i--
+        }
+        i = 50;
+        do{
+            console.log(i)
+        }while(i<50)
+        let n = Number(prompt())
+        while(n<0){
+            n = Number(prompt("Nhap lai"))
+        }
+        console.log(n)
+    </script>
+</body>
+</html>
