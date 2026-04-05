@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mystery Neon | Nostalgia Gaming</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --cg-bg: #11111c; --cg-panel: #1a1a2e; --cg-purple: #6a5acd; --primary: #00f2ff; --card-bg: #0a0a1a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: 'Outfit', sans-serif; }
+        body { background: var(--cg-bg); color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        .cg-navbar { height: 60px; background: var(--cg-panel); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 100; }
+        .cg-logo { font-size: 20px; font-weight: 900; display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none;}
+        .cg-nav-right { display: flex; align-items: center; gap: 15px; }
+        .cg-user-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s;}
+        .cg-user-btn:hover { background: rgba(255,255,255,0.2); }
+        .cg-user-btn.login-mode { background: var(--cg-purple); }
+
+        .cg-layout { display: flex; max-width: 1400px; width: 100%; margin: 20px auto; gap: 20px; padding: 0 20px; flex: 1; overflow: hidden; }
+        .cg-main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow-y: auto; }
+
+        .cg-sidebar { width: 300px; display: flex; flex-direction: column; overflow-y: auto; padding-right: 5px; }
+        .cg-sidebar h3 { font-size: 18px; margin-bottom: 15px; padding-left: 5px; color: #fff; }
+        .cg-games-list { display: flex; flex-direction: column; gap: 10px; }
+        .cg-game-item { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 12px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .cg-game-item:hover { background: rgba(255,255,255,0.08); transform: translateX(5px); border-color: rgba(255,255,255,0.1); }
+        .cg-game-thumb { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+        .cg-game-info { display: flex; flex-direction: column; gap: 5px; }
+        .cg-game-title { font-size: 15px; font-weight: bold; color: #fff; }
+        .cg-game-cate { font-size: 12px; color: #888; }
+
+        .cg-player-wrapper { flex: 1; background: #050510; border-radius: 12px; position: relative; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 30px; box-shadow: inset 0 0 50px rgba(188, 19, 254, 0.1); border: 1px solid rgba(188,19,254,0.2); }
+        .cg-warning { position: absolute; top: 0; left: 0; width: 100%; background: rgba(139, 0, 0, 0.95); padding: 12px; display: none; justify-content: center; align-items: center; gap: 15px; z-index: 60; font-size: 14px;}
+        .cg-warning span { color: #ffcccc; font-weight: 600; }
+        .cg-btn-solid { background: #fff; color: #000; border: none; padding: 5px 15px; border-radius: 15px; cursor: pointer; font-weight: bold; }
+
+        .stats-hud { display: flex; gap: 20px; width: 100%; justify-content: center; margin-bottom: 30px; margin-top: 10px;}
+        .stat-box { background: rgba(0,0,0,0.8); border: 1px solid rgba(188,19,254,0.3); padding: 15px 30px; border-radius: 15px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center;}
+        .stat-label { font-size: 12px; color: #ccc; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;}
+        .stat-val { font-size: 28px; font-weight: bold; font-family: 'Press Start 2P', cursive; }
+        .val-coin { color: #f1c40f; text-shadow: 0 0 15px #f1c40f; }
+        .val-ticket { color: #00f2ff; text-shadow: 0 0 15px #00f2ff; }
+
+        .hunt-area { background: rgba(10,10,20,0.8); border: 1px dashed rgba(0,242,255,0.5); border-radius: 15px; padding: 25px; text-align: center; width: 100%; max-width: 600px; margin-bottom: 50px; box-shadow: inset 0 0 20px rgba(0,242,255,0.1);}
+        .hunt-title { color: #00f2ff; margin-bottom: 10px; font-size: 20px; text-shadow: 0 0 10px rgba(0,242,255,0.5); font-family: 'Press Start 2P', cursive;}
+        .hunt-btn { background: rgba(0,242,255,0.1); border: 1px solid #00f2ff; color: #00f2ff; padding: 12px 30px; border-radius: 30px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 15px; font-family: 'Outfit', sans-serif;}
+        .hunt-btn:hover { background: #00f2ff; color: #000; box-shadow: 0 0 20px rgba(0,242,255,0.6); }
+        .hunt-btn:disabled { border-color: #555; color: #555; cursor: not-allowed; background: transparent; box-shadow: none; }
+        .hunt-log { margin-top: 15px; font-size: 14px; min-height: 20px; font-weight: bold; font-family: 'Courier New', Courier, monospace;}
+
+        .gacha-title { font-family: 'Press Start 2P', cursive; font-size: 18px; color: #bc13fe; text-shadow: 0 0 15px #bc13fe; margin-bottom: 10px;}
+
+        .cards-container { display: flex; gap: 25px; justify-content: center; perspective: 1200px; margin-top: 20px;}
+        .card { width: 160px; height: 230px; position: relative; cursor: pointer; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1); }
+        .card.flipped { transform: rotateY(180deg); pointer-events: none; }
+        .card:hover:not(.flipped) { transform: translateY(-10px) scale(1.05); }
+        
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 50px; background: var(--card-bg); border: 2px solid transparent; }
+        
+        .back { border-color: #bc13fe; box-shadow: 0 0 20px rgba(188,19,254,0.3), inset 0 0 15px rgba(188,19,254,0.1); color: #bc13fe; text-shadow: 0 0 15px #bc13fe; background: repeating-linear-gradient( 45deg, rgba(188,19,254, 0.05), rgba(188,19,254, 0.05) 10px, transparent 10px, transparent 20px );}
+        .front { transform: rotateY(180deg); background: #050505;}
+        .front h3 { font-family: 'Press Start 2P', cursive; font-size: 16px; margin-top: 20px;}
+        
+        .prize-500 { border-color: #a8a8a8; color: #a8a8a8; box-shadow: 0 0 20px rgba(168,168,168,0.4), inset 0 0 20px rgba(168,168,168,0.2); text-shadow: 0 0 10px #a8a8a8;}
+        .prize-1000 { border-color: #f1c40f; color: #f1c40f; box-shadow: 0 0 30px rgba(241,196,15,0.6), inset 0 0 20px rgba(241,196,15,0.3); text-shadow: 0 0 15px #f1c40f;}
+        .prize-5000 { border-color: #ff007a; color: #ff007a; box-shadow: 0 0 40px rgba(255,0,122,0.8), inset 0 0 30px rgba(255,0,122,0.4); text-shadow: 0 0 20px #ff007a;}
+
+        .action-btn { margin-top: 50px; padding: 15px 50px; background: linear-gradient(135deg, #00f2ff, #bc13fe); color: #fff; border: none; border-radius: 30px; font-weight: 800; cursor: pointer; font-size: 16px; font-family: 'Outfit', sans-serif; text-transform: uppercase; box-shadow: 0 10px 20px rgba(188,19,254,0.4); display: none; transition: 0.3s; letter-spacing: 1px;}
+        .action-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(188,19,254,0.6); }
+
+        @media (max-width: 900px) { .cg-sidebar { display: none; } }
+        @media (max-width: 600px) { .cards-container { gap: 10px; } .card { width: 100px; height: 150px; } .card-face { font-size: 30px; } .front h3 { font-size: 10px; } .stat-box { padding: 10px 15px;} .stat-val { font-size: 18px; } .hunt-title { font-size: 14px;} }
+    </style>
+</head>
+<body>
+
+    <nav class="cg-navbar">
+        <a href="index.html" class="cg-logo"><i class="fas fa-gamepad" style="color: var(--cg-purple);"></i> CRAZY NOSTALGIA</a>
+        <div class="cg-nav-right">
+            <button class="cg-user-btn" id="nav-user-btn" onclick="window.location.href='login.html'">Đăng nhập</button>
+        </div>
+    </nav>
+
+    <div class="cg-layout">
+        <div class="cg-main">
+            <div class="cg-player-wrapper">
+                <div class="cg-warning" id="guest-warning">
+                    <span>Bạn phải Đăng Nhập để tham gia Lật Thẻ!</span>
+                    <button class="cg-btn-solid" onclick="window.location.href='login.html'">Đăng nhập ngay</button>
+                </div>
+
+                <div class="stats-hud">
+                    <div class="stat-box">
+                        <div class="stat-label">Tài sản (Xu)</div>
+                        <div class="stat-val val-coin" id="hud-coins">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Vé Vàng</div>
+                        <div class="stat-val val-ticket" id="hud-tickets">0</div>
+                    </div>
+                </div>
+
+                <div class="hunt-area">
+                    <h2 class="hunt-title">SYSTEM HACKER</h2>
+                    <p style="color: #aaa; font-size: 14px; margin-bottom: 5px;">Chi phí: <strong style="color: #f1c40f;">100 Xu</strong> / 1 lần soát mã nguồn</p>
+                    <p style="color: #666; font-size: 12px;">Tỷ lệ: 15% ra Vé Vàng | 85% không nhận được gì.</p>
+                    <button class="hunt-btn" id="btn-hunt" onclick="GachaGame.huntTicket()">Khởi Chạy Tool</button>
+                    <div class="hunt-log" id="hunt-log"></div>
+                </div>
+
+                <h3 class="gacha-title">CHỌN 1 THẺ BÍ ẨN</h3>
+                <p style="color: #00f2ff; margin-bottom: 10px; font-size: 14px; font-weight: bold;">(Tiêu hao: 1 Vé Vàng/lượt)</p>
+
+                <div class="cards-container" id="cards-container">
+                    </div>
+
+                <button class="action-btn" id="btn-reset" onclick="GachaGame.resetBoard()">Chơi tiếp lượt mới</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userData = JSON.parse(localStorage.getItem('currentUser'));
+        let isGuestUser = (!userData || userData.isGuest === true || userData.username === 'Guest');
+        
+        let userBtn = document.getElementById('nav-user-btn');
+        if(isGuestUser) {
+            document.getElementById('guest-warning').style.display = 'flex';
+            document.getElementById('btn-hunt').disabled = true;
+            userBtn.classList.add('login-mode');
+            userBtn.innerHTML = 'Đăng nhập';
+        } else {
+            userBtn.innerHTML = `<i class="fas fa-user-circle"></i> ${userData.username}`;
+            userBtn.onclick = null; 
+            if (typeof userData.tickets === 'undefined') userData.tickets = 0;
+        }
+
+        const GachaGame = {
+            isFlipping: false,
+
+            init() {
+                this.updateHUD();
+                this.resetBoard();
+            },
+
+            updateHUD() {
+                if(isGuestUser) return;
+                document.getElementById('hud-coins').innerText = userData.coins || 0;
+                document.getElementById('hud-tickets').innerText = userData.tickets || 0;
+                localStorage.setItem('currentUser', JSON.stringify(userData));
+                localStorage.setItem('user_' + userData.username, JSON.stringify(userData));
+            },
+
+            huntTicket() {
+                if(isGuestUser) return;
+                if((userData.coins || 0) < 100) return alert("Bạn không đủ 100 Xu để chạy Tool!");
+
+                let btn = document.getElementById('btn-hunt');
+                let log = document.getElementById('hunt-log');
+                
+                // Trừ tiền ngay lập tức
+                userData.coins -= 100;
+                this.updateHUD();
+
+                btn.disabled = true;
+                btn.innerText = "Đang quét mã nguồn...";
+                log.innerText = "";
+                log.style.color = "#aaa";
+
+                // Giả lập delay 1 giây cho kịch tính
+                setTimeout(() => {
+                    let rand = Math.floor(Math.random() * 100) + 1;
+                    if(rand <= 15) { // Tỷ lệ 15% ra vé
+                        userData.tickets++;
+                        log.innerText = "> LỖ HỔNG PHÁT HIỆN: +1 VÉ VÀNG!";
+                        log.style.color = "#00f2ff";
+                        log.style.textShadow = "0 0 10px #00f2ff";
+                    } else {
+                        log.innerText = "> Thất bại. Không tìm thấy thẻ nào.";
+                        log.style.color = "#ff4757";
+                        log.style.textShadow = "none";
+                    }
+                    this.updateHUD();
+                    btn.disabled = false;
+                    btn.innerText = "Tiếp tục Hack (100 Xu)";
+                }, 1000);
+            },
+
+            resetBoard() {
+                this.isFlipping = false;
+                document.getElementById('btn-reset').style.display = 'none';
+                document.getElementById('hunt-log').innerText = "";
+                
+                const container = document.getElementById('cards-container');
+                container.innerHTML = '';
+                
+                for(let i = 0; i < 3; i++) {
+                    let card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div class="card-face back"><i class="fas fa-ticket-alt"></i></div>
+                        <div class="card-face front" id="front-${i}"></div>
+                    `;
+                    card.onclick = () => this.flipCard(card, i);
+                    container.appendChild(card);
+                }
+            },
+
+            flipCard(card, index) {
+                if(isGuestUser) return;
+                if(this.isFlipping) return;
+                
+                if(userData.tickets < 1) {
+                    alert("Bạn không đủ Vé Vàng! Hãy Hack Hệ Thống hoặc làm nhiệm vụ để tìm thêm.");
+                    return;
+                }
+
+                // Trừ vé
+                this.isFlipping = true;
+                userData.tickets--;
+                this.updateHUD();
+
+                // Tính phần thưởng (5% Jackpot, 25% Vàng, 70% Bạc)
+                let rand = Math.floor(Math.random() * 100) + 1;
+                let prize = 0; let prizeClass = ""; let prizeIcon = "";
+
+                if (rand <= 5) {
+                    prize = 5000; prizeClass = "prize-5000"; prizeIcon = "fa-gem";
+                } else if (rand <= 30) {
+                    prize = 1000; prizeClass = "prize-1000"; prizeIcon = "fa-star";
+                } else {
+                    prize = 500; prizeClass = "prize-500"; prizeIcon = "fa-coins";
+                }
+
+                // Gắn diện mạo thẻ đã chọn
+                let front = document.getElementById(`front-${index}`);
+                front.className = `card-face front ${prizeClass}`;
+                front.innerHTML = `<i class="fas ${prizeIcon}"></i> <h3>+${prize} XU</h3>`;
+
+                card.classList.add('flipped');
+
+                // Lật 2 thẻ còn lại để khè người chơi
+                setTimeout(() => {
+                    let allCards = document.querySelectorAll('.card');
+                    allCards.forEach((otherCard, idx) => {
+                        if(idx !== index) {
+                            let fakePrize = Math.random() > 0.5 ? 500 : 1000;
+                            if (Math.random() > 0.95) fakePrize = 5000; // Đôi khi nhá hàng cái 5000
+                            
+                            let fClass = fakePrize === 5000 ? "prize-5000" : (fakePrize === 1000 ? "prize-1000" : "prize-500");
+                            let fIcon = fakePrize === 5000 ? "fa-gem" : (fakePrize === 1000 ? "fa-star" : "fa-coins");
+                            
+                            let fFront = document.getElementById(`front-${idx}`);
+                            fFront.className = `card-face front ${fClass}`;
+                            fFront.innerHTML = `<i class="fas ${fIcon}"></i> <h3>${fakePrize}</h3>`;
+                            otherCard.classList.add('flipped');
+                            otherCard.style.opacity = '0.4'; 
+                        }
+                    });
+
+                    // Trả thưởng
+                    userData.coins += prize;
+                    this.updateHUD();
+                    
+                    // Hiện nút chơi tiếp
+                    setTimeout(() => {
+                        document.getElementById('btn-reset').style.display = 'block';
+                    }, 600);
+
+                }, 800);
+            }
+        };
+
+        GachaGame.init();
+    </script>
+</body>
+</html>

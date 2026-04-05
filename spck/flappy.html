@@ -1,0 +1,371 @@
+\<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cyber Bird | Nostalgia Gaming</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --cg-bg: #11111c; --cg-panel: #1a1a2e; --cg-purple: #6a5acd; --primary: #00f2ff; }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: 'Outfit', sans-serif; }
+        body { background: var(--cg-bg); color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; touch-action: none; }
+
+        .cg-navbar { height: 60px; background: var(--cg-panel); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 100; }
+        .cg-logo { font-size: 20px; font-weight: 900; display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none;}
+        .cg-nav-right { display: flex; align-items: center; gap: 15px; }
+        .cg-icon-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; }
+        .cg-user-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s;}
+        .cg-user-btn:hover { background: rgba(255,255,255,0.2); }
+        .cg-user-btn.login-mode { background: var(--cg-purple); }
+
+        .cg-layout { display: flex; max-width: 1400px; width: 100%; margin: 20px auto; gap: 20px; padding: 0 20px; flex: 1; overflow: hidden; }
+        .cg-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+        .cg-sidebar { width: 300px; display: flex; flex-direction: column; overflow-y: auto; padding-right: 5px; }
+        .cg-sidebar h3 { font-size: 18px; margin-bottom: 15px; padding-left: 5px; color: #fff; }
+        .cg-games-list { display: flex; flex-direction: column; gap: 10px; }
+        .cg-game-item { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 12px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .cg-game-item:hover { background: rgba(255,255,255,0.08); transform: translateX(5px); border-color: rgba(255,255,255,0.1); }
+        .cg-game-thumb { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+        .cg-game-info { display: flex; flex-direction: column; gap: 5px; }
+        .cg-game-title { font-size: 15px; font-weight: bold; color: #fff; }
+        .cg-game-cate { font-size: 12px; color: #888; }
+
+        .cg-player-wrapper { flex: 1; background: #050510; border-radius: 12px 12px 0 0; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; box-shadow: inset 0 0 50px rgba(0, 242, 255, 0.1); }
+        .cg-block-screen { position: absolute; inset: 0; background: rgba(17, 17, 28, 0.95); backdrop-filter: blur(10px); z-index: 200; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+        .cg-block-screen i { font-size: 70px; color: #ff4757; margin-bottom: 20px; text-shadow: 0 0 30px rgba(255, 71, 87, 0.5); }
+        .cg-block-screen h2 { font-family: 'Rajdhani', sans-serif; font-size: 35px; color: #fff; margin-bottom: 15px; font-weight: 800; }
+        .cg-block-screen p { color: #8b92a5; font-size: 16px; margin-bottom: 30px; max-width: 400px; line-height: 1.5; }
+        .btn-login-redirect { background: linear-gradient(135deg, var(--primary), var(--purple)); color: white; border: none; padding: 15px 40px; font-weight: bold; border-radius: 30px; cursor: pointer; font-size: 16px; transition: 0.3s; }
+
+        .cg-loading { position: absolute; inset: 0; background: #111; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
+        .cg-thumb { width: 220px; height: 130px; object-fit: cover; border-radius: 12px; border: 3px solid var(--primary); margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,242,255,0.4); }
+        .cg-loading h2 { font-size: 28px; margin-bottom: 30px; text-shadow: 0 2px 5px #000; }
+        .cg-bar-bg { width: 50%; max-width: 400px; height: 10px; background: #000; border-radius: 5px; overflow: hidden; margin-bottom: 10px; border: 1px solid rgba(0,242,255,0.3);}
+        .cg-bar-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.1s linear; box-shadow: 0 0 10px var(--primary);}
+
+        canvas { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .game-ui { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 40; }
+        .score-display { font-family: 'Press Start 2P', cursive; font-size: 50px; color: #fff; text-shadow: 0 0 20px #00f2ff, 2px 2px 0 #000; position: absolute; top: 50px; }
+        
+        /* Menu Box chuẩn Glassmorphism */
+        .menu-box { background: rgba(10, 10, 25, 0.7); backdrop-filter: blur(15px); padding: 40px; border-radius: 20px; text-align: center; pointer-events: auto; border: 1px solid rgba(0, 242, 255, 0.3); box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(0, 242, 255, 0.1); }
+        .menu-box h1 { font-family: 'Press Start 2P', cursive; color: var(--primary); font-size: 30px; margin-bottom: 15px; text-shadow: 0 0 15px var(--primary); }
+        .btn-play { background: linear-gradient(90deg, #00f2ff, #bc13fe); border: none; padding: 15px 40px; font-family: 'Outfit', sans-serif; font-weight: 800; color: #fff; border-radius: 30px; cursor: pointer; font-size: 18px; margin-top: 15px; transition: 0.3s; text-transform: uppercase; letter-spacing: 2px;}
+        .btn-play:hover { box-shadow: 0 10px 25px rgba(0, 242, 255, 0.5); transform: translateY(-3px); }
+        .hide { display: none !important; }
+
+        .cg-toolbar { height: 60px; background: var(--cg-panel); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-radius: 0 0 12px 12px; }
+        .cg-tool-left { display: flex; align-items: center; gap: 15px; }
+        .cg-tool-left img { width: 35px; height: 35px; border-radius: 8px; object-fit: cover; }
+        .cg-tool-right { display: flex; gap: 8px; }
+        .cg-tool-btn { background: rgba(255,255,255,0.05); border: none; color: #ccc; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
+        .cg-tool-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+        @media (max-width: 900px) { .cg-sidebar { display: none; } }
+    </style>
+</head>
+<body>
+
+    <nav class="cg-navbar">
+        <a href="index.html" class="cg-logo"><i class="fas fa-gamepad" style="color: var(--cg-purple);"></i> CRAZY NOSTALGIA</a>
+        <div class="cg-nav-right">
+            <button class="cg-icon-btn"><i class="fas fa-bell"></i></button>
+            <button class="cg-user-btn" id="nav-user-btn" onclick="window.location.href='login.html'">Đăng nhập</button>
+        </div>
+    </nav>
+
+    <div class="cg-layout">
+        <div class="cg-main">
+            <div class="cg-player-wrapper" id="game-player">
+                <div class="cg-block-screen" id="block-screen">
+                    <i class="fas fa-lock"></i>
+                    <h2>TÍNH NĂNG VIP</h2>
+                    <p>Tài khoản Khách không được phép chơi tựa game này. Vui lòng đăng nhập hoặc tạo tài khoản để trải nghiệm!</p>
+                    <button class="btn-login-redirect" onclick="window.location.href='login.html'">Đăng Nhập Ngay</button>
+                </div>
+
+                <div class="cg-loading" id="loading-overlay">
+                    <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500" class="cg-thumb">
+                    <h2>Cyber Bird</h2>
+                    <div class="cg-bar-bg"><div class="cg-bar-fill" id="load-fill"></div></div>
+                    <div style="font-weight: bold; color: var(--primary)"><span id="load-text">0%</span></div>
+                </div>
+
+                <canvas id="gameCanvas" width="480" height="640"></canvas>
+
+                <div class="game-ui">
+                    <div class="score-display hide" id="score">0</div>
+                    <div class="menu-box hide" id="start-screen">
+                        <h1>CYBER BIRD</h1>
+                        <p style="color:#aaa; font-size:14px; margin-bottom:20px;">Tốc độ tăng dần - 1 Cổng = 2 Xu!<br>SPACE hoặc Chạm để bay</p>
+                        <button class="btn-play" id="btn-start-game">KHỞI ĐỘNG</button>
+                    </div>
+                    <div class="menu-box hide" id="game-over-screen">
+                        <h1 style="color: #ff007a; text-shadow: 0 0 20px #ff007a;">CRASHED!</h1>
+                        <div style="margin: 20px 0; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px;">
+                            <div style="color: #aaa; font-size: 12px; letter-spacing: 1px;">SCORE</div>
+                            <div style="font-size: 30px; font-weight: bold; color: #fff;" id="final-score">0</div>
+                            <div style="width: 50px; height: 2px; background: rgba(255,255,255,0.1); margin: 10px auto;"></div>
+                            <div style="color: #aaa; font-size: 12px; letter-spacing: 1px;">BEST</div>
+                            <div style="color: var(--primary); font-size: 24px; font-weight: bold; text-shadow: 0 0 10px var(--primary);" id="best-score">0</div>
+                        </div>
+                        <div id="coin-reward" style="color: #f1c40f; font-size: 18px; font-weight: bold;">+0 Coins</div>
+                        <button class="btn-play" id="btn-restart-game">BAY LẠI</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cg-toolbar">
+                <div class="cg-tool-left">
+                    <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=100">
+                    <h3 style="font-size: 16px;">Cyber Bird</h3>
+                </div>
+                <div class="cg-tool-right">
+                    <button class="cg-tool-btn" onclick="toggleFullscreen()" title="Toàn màn hình"><i class="fas fa-expand"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="cg-sidebar">
+            <h3>🔥 Trò chơi nổi bật</h3>
+            <div class="cg-games-list">
+                <div class="cg-game-item" onclick="window.location.href='pacman.html'">
+                    <img src="https://images.unsplash.com/photo-1612404730960-5c71577fca11?w=200" class="cg-game-thumb" style="filter: hue-rotate(40deg);">
+                    <div class="cg-game-info"><div class="cg-game-title">Pac-Man Retro</div><div class="cg-game-cate">Hành động</div></div>
+                </div>
+                <div class="cg-game-item" onclick="window.location.href='snake.html'">
+                    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=200" class="cg-game-thumb" style="filter: hue-rotate(100deg);">
+                    <div class="cg-game-info"><div class="cg-game-title">Snake Xenzia</div><div class="cg-game-cate">Cổ điển</div></div>
+                </div>
+                <div class="cg-game-item" onclick="window.location.href='2048.html'">
+                    <img src="https://images.unsplash.com/photo-1614332287897-cdc485fa562d?w=200" class="cg-game-thumb">
+                    <div class="cg-game-info"><div class="cg-game-title">2048 Ultimate</div><div class="cg-game-cate">Logic</div></div>
+                </div>
+                <div class="cg-game-item" onclick="window.location.href='memory.html'">
+                    <img src="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=200" class="cg-game-thumb">
+                    <div class="cg-game-info"><div class="cg-game-title">Memory Master</div><div class="cg-game-cate">Trí tuệ</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleFullscreen() {
+            let elem = document.getElementById("game-player");
+            if (!document.fullscreenElement) elem.requestFullscreen().catch(err => {}); else document.exitFullscreen();
+        }
+
+        window.onload = () => {
+            let progress = 0;
+            let interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 20) + 10;
+                if(progress >= 100) {
+                    progress = 100; clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('loading-overlay').style.opacity = '0';
+                        setTimeout(() => { 
+                            document.getElementById('loading-overlay').style.display = 'none'; 
+                            if(!isGuestUser) document.getElementById('start-screen').classList.remove('hide');
+                        }, 500);
+                    }, 300);
+                }
+                document.getElementById('load-fill').style.width = progress + '%';
+                document.getElementById('load-text').innerText = progress + '%';
+            }, 150);
+        };
+
+        let userData = JSON.parse(localStorage.getItem('currentUser'));
+        let isGuestUser = (!userData || userData.isGuest === true || userData.username === 'Guest');
+        
+        let userBtn = document.getElementById('nav-user-btn');
+        if(isGuestUser) {
+            userBtn.classList.add('login-mode');
+            userBtn.innerHTML = 'Đăng nhập';
+            document.getElementById('block-screen').style.display = 'flex';
+        } else {
+            userBtn.innerHTML = `<i class="fas fa-user-circle"></i> ${userData.username}`;
+            userBtn.onclick = null; 
+        }
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let frames = 0; const DEGREE = Math.PI / 180;
+
+        // VẼ BACKGROUND SYNTHWAVE
+        const bg = {
+            draw: function() {
+                // Gradient nền
+                let grd = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                grd.addColorStop(0, "#090914"); grd.addColorStop(1, "#210936");
+                ctx.fillStyle = grd; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Mặt trời Neon
+                ctx.save();
+                ctx.beginPath(); ctx.arc(canvas.width/2, canvas.height - 150, 120, 0, Math.PI*2);
+                let sunGrd = ctx.createLinearGradient(0, canvas.height - 270, 0, canvas.height - 30);
+                sunGrd.addColorStop(0, "#ff007a"); sunGrd.addColorStop(1, "#f1c40f");
+                ctx.fillStyle = sunGrd; ctx.shadowBlur = 50; ctx.shadowColor = "#ff007a"; ctx.fill();
+                
+                // Cắt rãnh mặt trời
+                ctx.globalCompositeOperation = 'destination-out';
+                for(let i=0; i<6; i++) { ctx.fillRect(canvas.width/2 - 130, canvas.height - 130 + i*20, 260, 4 + i*2); }
+                ctx.restore();
+
+                // Lưới ảo ảnh (Grid)
+                ctx.strokeStyle = "rgba(0, 242, 255, 0.15)"; ctx.lineWidth = 1;
+                for(let i=0; i<30; i++) {
+                    let y = canvas.height - 150 + ((frames * 2 + i * 20) % 150);
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+                }
+                
+                // Đất đen dưới cùng
+                ctx.fillStyle = "#050510"; ctx.fillRect(0, canvas.height - 150, canvas.width, 150);
+                ctx.strokeStyle = "#00f2ff"; ctx.lineWidth = 3; ctx.shadowBlur = 10; ctx.shadowColor = "#00f2ff";
+                ctx.beginPath(); ctx.moveTo(0, canvas.height - 150); ctx.lineTo(canvas.width, canvas.height - 150); ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        // BIRD -> PHI THUYỀN ÁNH SÁNG
+        const bird = {
+            x: 60, y: 150, w: 28, h: 20, speed: 0, gravity: 0.35, jump: 6, rotation: 0, trails: [],
+            draw: function() {
+                // Vẽ đuôi lửa (Trail)
+                ctx.fillStyle = "rgba(0, 242, 255, 0.3)";
+                for(let i=0; i<this.trails.length; i++) {
+                    let t = this.trails[i];
+                    ctx.beginPath(); ctx.arc(t.x - 10 - i*2, t.y, 8 - i, 0, Math.PI*2); ctx.fill();
+                }
+
+                ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rotation);
+                
+                // Thân phi thuyền
+                ctx.fillStyle = "#fff"; ctx.shadowBlur = 20; ctx.shadowColor = "#00f2ff";
+                ctx.beginPath(); ctx.moveTo(this.w/2, 0); ctx.lineTo(-this.w/2, -this.h/2); ctx.lineTo(-this.w/3, 0); ctx.lineTo(-this.w/2, this.h/2); ctx.fill();
+                
+                // Đèn phản quang
+                ctx.fillStyle = "#ff007a"; ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI*2); ctx.fill();
+                ctx.restore();
+            },
+            update: function() {
+                this.speed += this.gravity; this.y += this.speed;
+                if(this.speed < this.jump/2) this.rotation = -15 * DEGREE; else { this.rotation += 4 * DEGREE; this.rotation = Math.min(this.rotation, 90 * DEGREE); }
+                if(this.y + this.h/2 >= canvas.height - 150) { this.y = canvas.height - 150 - this.h/2; Game.over(); }
+                
+                // Lưu vết
+                this.trails.unshift({x: this.x, y: this.y});
+                if(this.trails.length > 5) this.trails.pop();
+            },
+            flap: function() { this.speed = -this.jump; }
+        }
+
+        // PIPES -> CỔNG LASER
+        const pipes = {
+            position: [], w: 60, h: 0, dx: 3.5, gap: 250, maxYPos: -150, framesSinceLastSpawn: 0, 
+            draw: function() {
+                for(let i=0; i<this.position.length; i++){
+                    let p = this.position[i]; let topY = p.y; let bottomY = p.y + this.gap;
+                    
+                    // Cột Laser
+                    ctx.fillStyle = "rgba(188, 19, 254, 0.1)"; ctx.fillRect(p.x, 0, this.w, topY); ctx.fillRect(p.x, bottomY, this.w, canvas.height - 150 - bottomY);
+                    
+                    // Viền Neon sáng
+                    ctx.strokeStyle = "#bc13fe"; ctx.lineWidth = 3; ctx.shadowBlur = 15; ctx.shadowColor = "#bc13fe";
+                    ctx.strokeRect(p.x, 0, this.w, topY); ctx.strokeRect(p.x, bottomY, this.w, canvas.height - 150 - bottomY);
+                    
+                    // Đầu khóa Laser
+                    ctx.fillStyle = "#fff"; ctx.shadowBlur = 20; ctx.shadowColor = "#ff007a";
+                    ctx.fillRect(p.x - 5, topY - 10, this.w + 10, 10); ctx.fillRect(p.x - 5, bottomY, this.w + 10, 10);
+                    ctx.shadowBlur = 0;
+                }
+            },
+            update: function() {
+                let currentSpawnRate = Math.max(35, Math.floor(280 / this.dx));
+                this.framesSinceLastSpawn++;
+                if(this.framesSinceLastSpawn >= currentSpawnRate) {
+                    this.position.push({ x: canvas.width, y: Math.max(50, Math.floor(Math.random()*(canvas.height - 150 - this.gap - 100)) + 50) });
+                    this.framesSinceLastSpawn = 0;
+                }
+                for(let i=0; i<this.position.length; i++){
+                    let p = this.position[i]; p.x -= this.dx;
+                    if(p.x + this.w <= 0){
+                        this.position.shift(); score.value += 1;
+                        document.getElementById('score').innerText = score.value;
+                        if (this.dx < 8) this.dx += 0.15; 
+                        i--; continue; 
+                    }
+                    let birdLeft = bird.x - bird.w/2 + 5; let birdRight = bird.x + bird.w/2 - 5; let birdTop = bird.y - bird.h/2 + 5; let birdBottom = bird.y + bird.h/2 - 5;
+                    let pipeLeft = p.x; let pipeRight = p.x + this.w; let topPipeBottom = p.y; let bottomPipeTop = p.y + this.gap;
+                    if (birdRight > pipeLeft && birdLeft < pipeRight) {
+                        if (birdTop < topPipeBottom || birdBottom > bottomPipeTop) Game.over();
+                    }
+                }
+            },
+            reset: function() { this.position = []; this.dx = 3.5; this.framesSinceLastSpawn = 0; }
+        }
+
+        const score = { value: 0, reset: function() { this.value = 0; document.getElementById('score').innerText = 0; } }
+
+        const Game = {
+            state: 'start',
+            loop: function() {
+                if (Game.state === 'playing') { bird.update(); pipes.update(); frames++; }
+                bg.draw(); pipes.draw();
+                if (Game.state !== 'start') bird.draw();
+                requestAnimationFrame(Game.loop);
+            },
+            start: function() {
+                if (this.state === 'playing') return;
+                this.state = 'playing';
+                document.getElementById('start-screen').classList.add('hide'); document.getElementById('score').classList.remove('hide');
+                bird.y = 200; bird.speed = 0; bird.rotation = 0; bird.trails = [];
+                pipes.reset(); score.reset(); frames = 0;
+            },
+            over: function() {
+                this.state = 'over'; 
+                document.getElementById('game-over-screen').classList.remove('hide');
+                document.getElementById('score').classList.add('hide'); 
+                document.getElementById('final-score').innerText = score.value;
+                
+                if(!isGuestUser) {
+                    if(score.value > (userData.flappy_best || 0)) userData.flappy_best = score.value;
+                    if(score.value > (userData.flappy_mission || 0)) userData.flappy_mission = score.value;
+                    document.getElementById('best-score').innerText = userData.flappy_best;
+
+                    let earnedCoins = score.value * 2;
+                    document.getElementById('coin-reward').innerText = `+${earnedCoins} Coins`;
+                    
+                    userData.coins = (userData.coins || 0) + earnedCoins;
+                    localStorage.setItem('currentUser', JSON.stringify(userData));
+                    localStorage.setItem('user_' + userData.username, JSON.stringify(userData));
+                }
+            },
+            reset: function() {
+                this.state = 'start';
+                document.getElementById('game-over-screen').classList.add('hide'); document.getElementById('start-screen').classList.remove('hide');
+                bg.draw();
+            }
+        }
+
+        if (!isGuestUser) {
+            document.getElementById('btn-start-game').addEventListener('click', () => Game.start());
+            document.getElementById('btn-restart-game').addEventListener('click', () => Game.reset());
+            window.addEventListener('keydown', e => { if (e.code === 'Space') handleInput(); });
+            canvas.addEventListener('mousedown', handleInput);
+            canvas.addEventListener('touchstart', e => { if(e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') { e.preventDefault(); handleInput(); } }, {passive: false});
+
+            function handleInput() {
+                if(Game.state === 'start') Game.start();
+                else if(Game.state === 'playing') bird.flap();
+                else if(Game.state === 'over') Game.reset();
+            }
+            Game.loop();
+        } else {
+            bg.draw(); 
+        }
+    </script>
+</body>
+</html>

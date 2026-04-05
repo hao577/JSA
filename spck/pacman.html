@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pac-Man Neon | Nostalgia Gaming</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --cg-bg: #11111c; --cg-panel: #1a1a2e; --cg-purple: #6a5acd; --primary: #f1c40f; }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: 'Outfit', sans-serif; }
+        body { background: var(--cg-bg); color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; touch-action: none; }
+
+        .cg-navbar { height: 60px; background: var(--cg-panel); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 100; }
+        .cg-logo { font-size: 20px; font-weight: 900; display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none;}
+        .cg-nav-right { display: flex; align-items: center; gap: 15px; }
+        .cg-icon-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; }
+        .cg-user-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s;}
+        .cg-user-btn.login-mode { background: var(--cg-purple); }
+
+        .cg-layout { display: flex; max-width: 1400px; width: 100%; margin: 20px auto; gap: 20px; padding: 0 20px; flex: 1; overflow: hidden; }
+        .cg-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+        .cg-sidebar { width: 300px; display: flex; flex-direction: column; overflow-y: auto; padding-right: 5px; }
+        .cg-sidebar h3 { font-size: 18px; margin-bottom: 15px; padding-left: 5px; color: #fff; }
+        .cg-games-list { display: flex; flex-direction: column; gap: 10px; }
+        .cg-game-item { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 12px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .cg-game-item:hover { background: rgba(255,255,255,0.08); transform: translateX(5px); border-color: rgba(255,255,255,0.1); }
+        .cg-game-thumb { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+        .cg-game-info { display: flex; flex-direction: column; gap: 5px; }
+        .cg-game-title { font-size: 15px; font-weight: bold; color: #fff; }
+        .cg-game-cate { font-size: 12px; color: #888; }
+
+        .cg-player-wrapper { flex: 1; background: #050510; border-radius: 12px 12px 0 0; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; box-shadow: inset 0 0 50px rgba(0, 102, 255, 0.1); }
+
+        .cg-block-screen { position: absolute; inset: 0; background: rgba(17, 17, 28, 0.95); backdrop-filter: blur(10px); z-index: 200; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+        .cg-block-screen i { font-size: 70px; color: #ff4757; margin-bottom: 20px; text-shadow: 0 0 30px rgba(255, 71, 87, 0.5); }
+        .cg-block-screen h2 { font-family: 'Rajdhani', sans-serif; font-size: 35px; color: #fff; margin-bottom: 15px; font-weight: 800; }
+        .btn-login-redirect { background: linear-gradient(135deg, var(--primary), var(--purple)); color: white; border: none; padding: 15px 40px; font-weight: bold; border-radius: 30px; cursor: pointer; font-size: 16px; margin-top:20px; }
+
+        .cg-loading { position: absolute; inset: 0; background: #111; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
+        .cg-thumb { width: 220px; height: 130px; object-fit: cover; border-radius: 12px; border: 3px solid var(--primary); margin-bottom: 20px; box-shadow: 0 10px 30px rgba(241,196,15,0.4); filter: hue-rotate(40deg);}
+        .cg-bar-bg { width: 50%; max-width: 400px; height: 10px; background: #000; border-radius: 5px; overflow: hidden; margin-bottom: 10px; border: 1px solid rgba(241,196,15,0.3);}
+        .cg-bar-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.1s linear; box-shadow: 0 0 10px var(--primary);}
+
+        canvas { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .game-ui { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 40; }
+        
+        .score-hud { position: absolute; top: 15px; left: 20px; display: flex; gap: 15px; }
+        .hud-box { background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); padding: 8px 20px; border-radius: 10px; border: 1px solid rgba(241,196,15,0.3); text-align: center; min-width: 90px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);}
+        .hud-label { font-size: 11px; color: #ccc; font-weight: bold; letter-spacing: 1px;}
+        .hud-val { font-size: 22px; color: var(--primary); font-weight: bold; font-family: 'Press Start 2P', cursive; margin-top: 5px; text-shadow: 0 0 10px var(--primary);}
+
+        .menu-box { background: rgba(10, 10, 15, 0.8); backdrop-filter: blur(15px); padding: 40px; border-radius: 20px; text-align: center; pointer-events: auto; border: 1px solid rgba(241, 196, 15, 0.3); box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(241, 196, 15, 0.1); }
+        .menu-box h1 { font-family: 'Press Start 2P', cursive; color: var(--primary); font-size: 30px; margin-bottom: 15px; text-shadow: 0 0 15px var(--primary); }
+        .btn-play { background: linear-gradient(90deg, #f1c40f, #e67e22); border: none; padding: 15px 40px; font-family: 'Outfit', sans-serif; font-weight: 800; color: #000; border-radius: 30px; cursor: pointer; font-size: 18px; margin-top: 15px; transition: 0.3s; text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 10px 20px rgba(241, 196, 15, 0.3);}
+        .btn-play:hover { box-shadow: 0 10px 30px rgba(241, 196, 15, 0.6); transform: translateY(-3px); }
+        .hide { display: none !important; }
+
+        .cg-toolbar { height: 60px; background: var(--cg-panel); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-radius: 0 0 12px 12px; }
+        .cg-tool-left { display: flex; align-items: center; gap: 15px; }
+        .cg-tool-left img { width: 35px; height: 35px; border-radius: 8px; object-fit: cover; filter: hue-rotate(40deg);}
+        .cg-tool-right { display: flex; gap: 8px; }
+        .cg-tool-btn { background: rgba(255,255,255,0.05); border: none; color: #ccc; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
+        .cg-tool-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+        @media (max-width: 900px) { .cg-sidebar { display: none; } }
+    </style>
+</head>
+<body>
+
+    <nav class="cg-navbar">
+        <a href="index.html" class="cg-logo"><i class="fas fa-gamepad" style="color: var(--cg-purple);"></i> CRAZY NOSTALGIA</a>
+        <div class="cg-nav-right">
+            <button class="cg-icon-btn"><i class="fas fa-bell"></i></button>
+            <button class="cg-user-btn" id="nav-user-btn" onclick="window.location.href='login.html'">Đăng nhập</button>
+        </div>
+    </nav>
+
+    <div class="cg-layout">
+        <div class="cg-main">
+            <div class="cg-player-wrapper" id="game-player">
+                
+                <div class="cg-block-screen" id="block-screen">
+                    <i class="fas fa-lock"></i>
+                    <h2>TÍNH NĂNG VIP</h2>
+                    <p>Tài khoản Khách không được phép chơi tựa game này. Vui lòng đăng nhập hoặc tạo tài khoản để trải nghiệm!</p>
+                    <button class="btn-login-redirect" onclick="window.location.href='login.html'">Đăng Nhập Ngay</button>
+                </div>
+
+                <div class="cg-loading" id="loading-overlay">
+                    <img src="https://images.unsplash.com/photo-1612404730960-5c71577fca11?w=500" class="cg-thumb">
+                    <h2>Pac-Man Neon</h2>
+                    <div class="cg-bar-bg"><div class="cg-bar-fill" id="load-fill"></div></div>
+                    <div style="font-weight: bold; color: var(--primary)"><span id="load-text">0%</span></div>
+                </div>
+
+                <canvas id="gameCanvas" width="418" height="418"></canvas>
+
+                <div class="game-ui">
+                    <div class="score-hud hide" id="score-hud">
+                        <div class="hud-box"><div class="hud-label">BI CÒN LẠI</div><div class="hud-val" id="dots-left">0</div></div>
+                        <div class="hud-box"><div class="hud-label">WINS</div><div class="hud-val" id="wins">0</div></div>
+                    </div>
+
+                    <div class="menu-box hide" id="start-screen">
+                        <h1>PAC-MAN NEON</h1>
+                        <p style="color:#aaa; font-size:14px; margin-bottom:20px;">Nhai sạch bi để nhận 200 Xu<br>Vuốt hoặc Phím mũi tên</p>
+                        <button class="btn-play" id="btn-start-game">KHỞI ĐỘNG</button>
+                    </div>
+
+                    <div class="menu-box hide" id="game-over-screen">
+                        <h1 id="end-title" style="text-shadow: 0 0 20px #ff4757;">GAME OVER</h1>
+                        <div id="coin-reward" style="color: gold; font-size: 24px; font-weight: bold; margin: 20px 0; text-shadow: 0 0 10px gold;">+0 Coins</div>
+                        <button class="btn-play" id="btn-restart-game">CHƠI LẠI</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cg-toolbar">
+                <div class="cg-tool-left">
+                    <img src="https://images.unsplash.com/photo-1612404730960-5c71577fca11?w=100" style="filter: hue-rotate(40deg);">
+                    <h3 style="font-size: 16px;">Pac-Man Neon</h3>
+                </div>
+                <div class="cg-tool-right">
+                    <button class="cg-tool-btn" onclick="toggleFullscreen()" title="Toàn màn hình"><i class="fas fa-expand"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="cg-sidebar">
+            <h3>🔥 Trò chơi nổi bật</h3>
+            <div class="cg-games-list">
+                <div class="cg-game-item" onclick="window.location.href='flappy.html'">
+                    <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=200" class="cg-game-thumb">
+                    <div class="cg-game-info"><div class="cg-game-title">Cyber Bird</div><div class="cg-game-cate">Kỹ năng</div></div>
+                </div>
+                <div class="cg-game-item" onclick="window.location.href='snake.html'">
+                    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=200" class="cg-game-thumb" style="filter: hue-rotate(100deg);">
+                    <div class="cg-game-info"><div class="cg-game-title">Snake Xenzia</div><div class="cg-game-cate">Cổ điển</div></div>
+                </div>
+                <div class="cg-game-item" onclick="window.location.href='2048.html'">
+                    <img src="https://images.unsplash.com/photo-1614332287897-cdc485fa562d?w=200" class="cg-game-thumb">
+                    <div class="cg-game-info"><div class="cg-game-title">2048 Ultimate</div><div class="cg-game-cate">Logic</div></div>
+                </div>
+                <div class="cg-game-item" onclick="window.location.href='memory.html'">
+                    <img src="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=200" class="cg-game-thumb">
+                    <div class="cg-game-info"><div class="cg-game-title">Memory Master</div><div class="cg-game-cate">Trí tuệ</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleFullscreen() {
+            let elem = document.getElementById("game-player");
+            if (!document.fullscreenElement) elem.requestFullscreen().catch(err => {}); else document.exitFullscreen();
+        }
+
+        window.onload = () => {
+            let progress = 0;
+            let interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 20) + 10;
+                if(progress >= 100) {
+                    progress = 100; clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('loading-overlay').style.opacity = '0';
+                        setTimeout(() => { 
+                            document.getElementById('loading-overlay').style.display = 'none'; 
+                            if(!isGuestUser) document.getElementById('start-screen').classList.remove('hide');
+                        }, 500);
+                    }, 300);
+                }
+                document.getElementById('load-fill').style.width = progress + '%';
+                document.getElementById('load-text').innerText = progress + '%';
+            }, 150);
+        };
+
+        let userData = JSON.parse(localStorage.getItem('currentUser'));
+        let isGuestUser = (!userData || userData.isGuest === true || userData.username === 'Guest');
+        
+        let userBtn = document.getElementById('nav-user-btn');
+        if(isGuestUser) {
+            userBtn.classList.add('login-mode');
+            userBtn.innerHTML = 'Đăng nhập';
+            document.getElementById('block-screen').style.display = 'flex';
+        } else {
+            userBtn.innerHTML = `<i class="fas fa-user-circle"></i> ${userData.username}`;
+            userBtn.onclick = null; 
+            document.getElementById('wins').innerText = userData.pacman_wins || 0;
+        }
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const TILE_SIZE = 22; // Cố định TILE_SIZE cho mượt 
+        
+        const mapTemplate = [
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,4,4,4,0,0,0,0,0,1,0,0,0,0,0,4,4,4,1],
+            [1,4,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,4,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,0,1],
+            [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
+            [1,1,1,1,0,1,1,1,2,1,2,1,1,1,0,1,1,1,1],
+            [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2],
+            [1,1,1,1,0,1,2,1,1,3,1,1,2,1,0,1,1,1,1],
+            [2,2,2,2,0,2,2,1,3,3,3,1,2,2,0,2,2,2,2],
+            [1,1,1,1,0,1,2,1,1,1,1,1,2,1,0,1,1,1,1],
+            [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2],
+            [1,1,1,1,0,1,2,1,1,1,1,1,2,1,0,1,1,1,1],
+            [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
+            [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
+            [1,4,0,1,0,0,0,0,0,2,0,0,0,0,0,1,0,4,1],
+            [1,4,0,1,0,1,0,1,1,1,1,1,0,1,0,1,0,4,1],
+            [1,4,4,0,0,1,0,0,0,1,0,0,0,1,0,0,4,4,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+        ];
+
+        let map = []; let totalDots = 0; let dotsEaten = 0; let sessionKills = 0; 
+        let nextPowerSpawnTime = 0; let powerPelletOnMap = false; let powerModeEndTime = 0; let frames = 0;
+
+        class Pacman {
+            constructor() { 
+                this.x = 9 * TILE_SIZE; this.y = 15 * TILE_SIZE; this.speed = 2; 
+                this.dx = 0; this.dy = 0; this.nextDx = 0; this.nextDy = 0; this.mouthOpen = 0; this.mouthDir = 1; 
+            }
+            draw() {
+                let px = this.x + TILE_SIZE/2; let py = this.y + TILE_SIZE/2;
+                let angleOffset = this.mouthOpen * 0.25 * Math.PI; let rotation = 0;
+                if(this.dx === 1) rotation = 0; else if(this.dx === -1) rotation = Math.PI; 
+                else if(this.dy === 1) rotation = Math.PI/2; else if(this.dy === -1) rotation = -Math.PI/2;
+                else if(this.nextDx === -1) rotation = Math.PI; else if(this.nextDy === -1) rotation = -Math.PI/2;
+                else if(this.nextDy === 1) rotation = Math.PI/2;
+
+                ctx.save(); ctx.translate(px, py); ctx.rotate(rotation);
+                
+                // GLOW HIỆU ỨNG CHO PACMAN
+                ctx.shadowBlur = 15; ctx.shadowColor = "#f1c40f";
+                ctx.beginPath(); ctx.arc(0, 0, TILE_SIZE/2.2, angleOffset, 2*Math.PI - angleOffset); ctx.lineTo(0, 0);
+                ctx.fillStyle = '#f1c40f'; ctx.fill(); 
+                ctx.shadowBlur = 0;
+                
+                ctx.restore();
+                this.mouthOpen += this.mouthDir * 0.15; if(this.mouthOpen >= 1 || this.mouthOpen <= 0) this.mouthDir *= -1;
+            }
+            update() {
+                if (this.x % TILE_SIZE === 0 && this.y % TILE_SIZE === 0) {
+                    let col = this.x / TILE_SIZE; let row = this.y / TILE_SIZE;
+                    if (col <= -1) { this.x = 18 * TILE_SIZE; col = 18; } else if (col >= 19) { this.x = 0; col = 0; }
+                    let nextCol = col + this.nextDx; let nextRow = row + this.nextDy;
+                    if(nextCol < 0) nextCol = 18; if(nextCol > 18) nextCol = 0;
+
+                    if (map[nextRow] && map[nextRow][nextCol] !== 1) { this.dx = this.nextDx; this.dy = this.nextDy; }
+                    let currNextCol = col + this.dx; let currNextRow = row + this.dy;
+                    if(currNextCol < 0) currNextCol = 18; if(currNextCol > 18) currNextCol = 0;
+                    if (map[currNextRow] && map[currNextRow][currNextCol] === 1) { this.dx = 0; this.dy = 0; }
+                }
+                this.x += this.dx * this.speed; this.y += this.dy * this.speed;
+                if (this.x < -TILE_SIZE) this.x = 19 * TILE_SIZE; if (this.x > 19 * TILE_SIZE) this.x = -TILE_SIZE;
+
+                let centerCol = Math.round(this.x / TILE_SIZE); let centerRow = Math.round(this.y / TILE_SIZE);
+                if (centerCol >= 0 && centerCol < 19 && map[centerRow]) {
+                    if (map[centerRow][centerCol] === 0) {
+                        map[centerRow][centerCol] = 2; dotsEaten++;
+                        document.getElementById('dots-left').innerText = totalDots - dotsEaten;
+                    } else if (map[centerRow][centerCol] === 5) {
+                        map[centerRow][centerCol] = 2; powerPelletOnMap = false; Game.activatePower(); 
+                    }
+                }
+            }
+        }
+
+        class Ghost {
+            constructor(startX, startY, color) { 
+                this.startX = startX; this.startY = startY; this.x = startX * TILE_SIZE; this.y = startY * TILE_SIZE; 
+                this.color = color; this.dx = 1; this.dy = 0; this.scared = false; this.dead = false; this.respawnTime = 0;
+            }
+            draw() {
+                if (this.dead) return; 
+                let px = this.x; let py = this.y; let drawColor = this.color;
+                if (this.scared) {
+                    let remaining = powerModeEndTime - performance.now();
+                    if (remaining < 3000) { drawColor = (Math.floor(remaining / 250) % 2 === 0) ? '#ffffff' : this.color; } 
+                    else { drawColor = '#ffffff'; }
+                }
+                
+                // GLOW MA MỊ CHO GHOST
+                ctx.shadowBlur = 10; ctx.shadowColor = drawColor;
+                ctx.fillStyle = drawColor;
+                ctx.beginPath(); ctx.arc(px + TILE_SIZE/2, py + TILE_SIZE/2, TILE_SIZE/2.2, Math.PI, 0);
+                
+                // Tà áo ma nhấp nhô
+                let wave = Math.sin(frames * 0.2 + this.x * 0.1) * 2;
+                ctx.lineTo(px + TILE_SIZE - 2, py + TILE_SIZE - 2 + wave); 
+                ctx.lineTo(px + TILE_SIZE/2, py + TILE_SIZE - 6 - wave); 
+                ctx.lineTo(px + 2, py + TILE_SIZE - 2 + wave); 
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                if (this.scared) {
+                    ctx.fillStyle = '#ff4757'; ctx.beginPath(); ctx.arc(px + TILE_SIZE/3, py + TILE_SIZE/2.5, 2, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(px + TILE_SIZE - TILE_SIZE/3, py + TILE_SIZE/2.5, 2, 0, Math.PI*2); ctx.fill();
+                    ctx.strokeStyle = '#ff4757'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(px + 4, py + TILE_SIZE - 4); ctx.lineTo(px + TILE_SIZE/2, py + TILE_SIZE - 8); ctx.lineTo(px + TILE_SIZE - 4, py + TILE_SIZE - 4); ctx.stroke();
+                } else {
+                    ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(px + TILE_SIZE/3, py + TILE_SIZE/2.5, 3, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(px + TILE_SIZE - TILE_SIZE/3, py + TILE_SIZE/2.5, 3, 0, Math.PI*2); ctx.fill();
+                    ctx.fillStyle = 'blue'; ctx.beginPath(); ctx.arc(px + TILE_SIZE/3 + this.dx, py + TILE_SIZE/2.5 + this.dy, 1.5, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(px + TILE_SIZE - TILE_SIZE/3 + this.dx, py + TILE_SIZE/2.5 + this.dy, 1.5, 0, Math.PI*2); ctx.fill();
+                }
+            }
+            update() {
+                if (this.dead) {
+                    if (performance.now() > this.respawnTime) {
+                        this.dead = false; this.x = this.startX * TILE_SIZE; this.y = this.startY * TILE_SIZE;
+                        this.scared = (powerModeEndTime > performance.now());
+                    } return;
+                }
+                let steps = this.scared ? 2 : 1; 
+                for (let s = 0; s < steps; s++) {
+                    if (this.x % TILE_SIZE === 0 && this.y % TILE_SIZE === 0) {
+                        let col = this.x / TILE_SIZE; let row = this.y / TILE_SIZE;
+                        if (col >= 0 && col <= 18) {
+                            let possibleMoves = []; let dirs = [{dx:0, dy:-1}, {dx:0, dy:1}, {dx:-1, dy:0}, {dx:1, dy:0}];
+                            dirs.forEach(d => {
+                                if (d.dx === -this.dx && d.dy === -this.dy && (this.dx !== 0 || this.dy !== 0)) return; 
+                                let nc = col + d.dx; let nr = row + d.dy;
+                                if(nc < 0) nc = 18; if(nc > 18) nc = 0;
+                                let cell = map[nr] ? map[nr][nc] : 1;
+                                if (cell !== 1 && cell !== 4) possibleMoves.push(d);
+                            });
+                            if (possibleMoves.length > 0) {
+                                let move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+                                this.dx = move.dx; this.dy = move.dy;
+                            } else { this.dx = -this.dx; this.dy = -this.dy; }
+                        }
+                    }
+                    this.x += this.dx; this.y += this.dy;
+                }
+                if (this.x < -TILE_SIZE) this.x = 19 * TILE_SIZE; if (this.x > 19 * TILE_SIZE) this.x = -TILE_SIZE;
+            }
+            die() { this.dead = true; this.scared = false; this.respawnTime = performance.now() + 5000; }
+        }
+
+        let pacman_obj; let ghosts = []; let reqAnimationId;
+
+        const Game = {
+            state: 'start',
+            start() {
+                if(this.state === 'playing') return; cancelAnimationFrame(reqAnimationId);
+                map = JSON.parse(JSON.stringify(mapTemplate)); pacman_obj = new Pacman();
+                ghosts = [new Ghost(9, 7, '#ff4757'), new Ghost(8, 9, '#00f2ff'), new Ghost(10, 9, '#ff9ff3')];
+                dotsEaten = 0; totalDots = 0; sessionKills = 0; powerPelletOnMap = false; powerModeEndTime = 0; frames = 0;
+                map.forEach(row => row.forEach(cell => { if(cell === 0) totalDots++; }));
+                document.getElementById('dots-left').innerText = totalDots;
+                document.getElementById('start-screen').classList.add('hide'); document.getElementById('game-over-screen').classList.add('hide');
+                document.getElementById('score-hud').classList.remove('hide');
+                nextPowerSpawnTime = performance.now() + 15000;
+                this.state = 'playing'; this.loop();
+            },
+            activatePower() {
+                powerModeEndTime = performance.now() + 20000; 
+                ghosts.forEach(g => { if (!g.dead) { g.scared = true; g.dx = -g.dx; g.dy = -g.dy; } });
+            },
+            loop() {
+                if(Game.state !== 'playing') return;
+                frames++; let now = performance.now();
+                ctx.fillStyle = '#050510'; ctx.fillRect(0, 0, canvas.width, canvas.height); // Nền tối sâu
+
+                let currentWallColor = '#0066ff'; 
+                let currentShadowColor = '#00f2ff';
+                
+                if (powerModeEndTime > 0) {
+                    let remaining = powerModeEndTime - now;
+                    if (remaining <= 0) { powerModeEndTime = 0; ghosts.forEach(g => { g.scared = false; }); nextPowerSpawnTime = now + 15000; } 
+                    else { 
+                        if (remaining < 3000 && Math.floor(remaining/250)%2===0) { currentWallColor = '#0066ff'; currentShadowColor = '#00f2ff'; }
+                        else { currentWallColor = '#ff007a'; currentShadowColor = '#ff4757'; }
+                    }
+                }
+
+                if (!powerPelletOnMap && powerModeEndTime === 0 && now > nextPowerSpawnTime) {
+                    let emptySpots = [];
+                    for(let y=0; y<19; y++) { for(let x=0; x<19; x++) { if (map[y][x] === 2) emptySpots.push({x, y}); } }
+                    if (emptySpots.length > 0) {
+                        let spot = emptySpots[Math.floor(Math.random() * emptySpots.length)];
+                        map[spot.y][spot.x] = 5; powerPelletOnMap = true;
+                    }
+                }
+
+                // VẼ LƯỚI TƯỜNG NEON
+                for(let y = 0; y < 19; y++) {
+                    for(let x = 0; x < 19; x++) {
+                        if(map[y][x] === 1) { 
+                            ctx.fillStyle = '#0a0a1a'; ctx.fillRect(x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE); 
+                            ctx.shadowBlur = 10; ctx.shadowColor = currentShadowColor;
+                            ctx.strokeStyle = currentWallColor; ctx.lineWidth = 1.5; ctx.strokeRect(x*TILE_SIZE+2, y*TILE_SIZE+2, TILE_SIZE-4, TILE_SIZE-4); 
+                            ctx.shadowBlur = 0;
+                        } else if(map[y][x] === 0) { 
+                            ctx.fillStyle = '#8b92a5'; ctx.beginPath(); ctx.arc(x*TILE_SIZE+TILE_SIZE/2, y*TILE_SIZE+TILE_SIZE/2, 2, 0, 2*Math.PI); ctx.fill(); 
+                        } else if(map[y][x] === 5) {
+                            let pulse = (Math.sin(frames * 0.1) + 1) * 2; ctx.fillStyle = '#fff'; 
+                            ctx.shadowBlur = 15; ctx.shadowColor = '#fff';
+                            ctx.beginPath(); ctx.arc(x*TILE_SIZE+TILE_SIZE/2, y*TILE_SIZE+TILE_SIZE/2, 4 + pulse, 0, 2*Math.PI); ctx.fill(); 
+                            ctx.shadowBlur = 0;
+                        }
+                    }
+                }
+
+                pacman_obj.update(); pacman_obj.draw();
+                ghosts.forEach(g => {
+                    g.update(); g.draw();
+                    if(g.dead) return;
+                    if(Math.hypot(g.x - pacman_obj.x, g.y - pacman_obj.y) < TILE_SIZE - 5) {
+                        if (g.scared) { g.die(); sessionKills++; } else { Game.over(false); }
+                    }
+                });
+
+                if(dotsEaten === totalDots) Game.over(true);
+                reqAnimationId = requestAnimationFrame(() => Game.loop());
+            },
+            over(won = false) {
+                this.state = 'over'; cancelAnimationFrame(reqAnimationId);
+                let earnedCoins = won ? 200 : 0; 
+                
+                document.getElementById('score-hud').classList.add('hide');
+                document.getElementById('game-over-screen').classList.remove('hide');
+                
+                const titleEl = document.getElementById('end-title');
+                if(won) { titleEl.innerText = "YOU WIN!"; titleEl.style.color = "#2ecc71"; titleEl.style.textShadow = "0 0 20px #2ecc71";}
+                else { titleEl.innerText = "GAME OVER"; titleEl.style.color = "#ff007a"; titleEl.style.textShadow = "0 0 20px #ff007a";}
+
+                if(!isGuestUser) {
+                    if(won) {
+                        userData.pacman_wins = (userData.pacman_wins || 0) + 1;
+                        userData.pacman_wins_mission = (userData.pacman_wins_mission || 0) + 1;
+                        document.getElementById('wins').innerText = userData.pacman_wins;
+                    }
+                    userData.pacman_kills = (userData.pacman_kills || 0) + sessionKills;
+                    userData.pacman_kills_mission = (userData.pacman_kills_mission || 0) + sessionKills;
+                    userData.coins = (userData.coins || 0) + earnedCoins;
+                    localStorage.setItem('currentUser', JSON.stringify(userData));
+                    localStorage.setItem('user_' + userData.username, JSON.stringify(userData));
+                    document.getElementById('coin-reward').innerText = `+${earnedCoins} Coins`;
+                }
+            }
+        };
+
+        if (!isGuestUser) {
+            document.getElementById('btn-start-game').addEventListener('click', () => Game.start());
+            document.getElementById('btn-restart-game').addEventListener('click', () => Game.start());
+            
+            document.addEventListener('keydown', e => {
+                if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) e.preventDefault();
+                if(Game.state !== 'playing') { if(e.code === 'Space') Game.start(); return; }
+                if(e.key === 'ArrowLeft') { pacman_obj.nextDx = -1; pacman_obj.nextDy = 0; }
+                else if(e.key === 'ArrowRight') { pacman_obj.nextDx = 1; pacman_obj.nextDy = 0; }
+                else if(e.key === 'ArrowUp') { pacman_obj.nextDx = 0; pacman_obj.nextDy = -1; }
+                else if(e.key === 'ArrowDown') { pacman_obj.nextDx = 0; pacman_obj.nextDy = 1; }
+            });
+
+            let tX = 0, tY = 0;
+            document.addEventListener('touchstart', e => { tX = e.changedTouches[0].screenX; tY = e.changedTouches[0].screenY; }, {passive: false});
+            document.addEventListener('touchend', e => {
+                if(e.target.tagName === 'BUTTON' || e.target.tagName === 'A') return;
+                e.preventDefault(); if(Game.state !== 'playing') return;
+                let dx = e.changedTouches[0].screenX - tX; let dy = e.changedTouches[0].screenY - tY;
+                if(Math.abs(dx) > Math.abs(dy)) {
+                    if(dx > 30) { pacman_obj.nextDx = 1; pacman_obj.nextDy = 0; } else if(dx < -30) { pacman_obj.nextDx = -1; pacman_obj.nextDy = 0; }
+                } else {
+                    if(dy > 30) { pacman_obj.nextDx = 0; pacman_obj.nextDy = 1; } else if(dy < -30) { pacman_obj.nextDx = 0; pacman_obj.nextDy = -1; }
+                }
+            }, {passive: false});
+        }
+    </script>
+</body>
+</html>

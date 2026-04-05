@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Neon | Nostalgia Gaming</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --cg-bg: #11111c; --cg-panel: #1a1a2e; --cg-purple: #6a5acd; --primary: #00e676; }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: 'Outfit', sans-serif; }
+        body { background: var(--cg-bg); color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; touch-action: none;}
+
+        .cg-navbar { height: 60px; background: var(--cg-panel); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 100; }
+        .cg-logo { font-size: 20px; font-weight: 900; display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none;}
+        .cg-nav-right { display: flex; align-items: center; gap: 15px; }
+        .cg-icon-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; }
+        .cg-user-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s;}
+        .cg-user-btn.login-mode { background: var(--cg-purple); }
+
+        .cg-layout { display: flex; max-width: 1400px; width: 100%; margin: 20px auto; gap: 20px; padding: 0 20px; flex: 1; overflow: hidden; }
+        .cg-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+        .cg-sidebar { width: 300px; display: flex; flex-direction: column; overflow-y: auto; padding-right: 5px; }
+        .cg-sidebar h3 { font-size: 18px; margin-bottom: 15px; padding-left: 5px; color: #fff; }
+        .cg-games-list { display: flex; flex-direction: column; gap: 10px; }
+        .cg-game-item { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 12px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .cg-game-item:hover { background: rgba(255,255,255,0.08); transform: translateX(5px); border-color: rgba(255,255,255,0.1); }
+        .cg-game-thumb { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+        .cg-game-info { display: flex; flex-direction: column; gap: 5px; }
+        .cg-game-title { font-size: 15px; font-weight: bold; color: #fff; }
+        .cg-game-cate { font-size: 12px; color: #888; }
+
+        .cg-player-wrapper { flex: 1; background: #000; border-radius: 12px 12px 0 0; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+
+        .cg-block-screen { position: absolute; inset: 0; background: rgba(17, 17, 28, 0.95); backdrop-filter: blur(10px); z-index: 200; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+        .cg-block-screen i { font-size: 70px; color: #ff4757; margin-bottom: 20px; text-shadow: 0 0 30px rgba(255, 71, 87, 0.5); }
+        .cg-block-screen h2 { font-family: 'Rajdhani', sans-serif; font-size: 35px; color: #fff; margin-bottom: 15px; font-weight: 800; }
+        .btn-login-redirect { background: linear-gradient(135deg, var(--primary), var(--purple)); color: white; border: none; padding: 15px 40px; font-weight: bold; border-radius: 30px; cursor: pointer; font-size: 16px; margin-top:20px; }
+
+        .cg-loading { position: absolute; inset: 0; background: #111; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
+        .cg-thumb { width: 220px; height: 130px; object-fit: cover; border-radius: 12px; border: 3px solid var(--primary); margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,230,118,0.4);}
+        .cg-bar-bg { width: 50%; max-width: 400px; height: 10px; background: #000; border-radius: 5px; overflow: hidden; margin-bottom: 10px; border: 1px solid rgba(0,230,118,0.3);}
+        .cg-bar-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.1s linear; box-shadow: 0 0 10px var(--primary);}
+
+        canvas { max-width: 100%; max-height: 100%; object-fit: contain; background: #12151e; border-radius: 12px; box-shadow: 0 0 50px rgba(0, 230, 118, 0.2);}
+        
+        .game-ui { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 40; }
+        .score-hud { position: absolute; top: 15px; left: 20px; display: flex; gap: 15px; }
+        .hud-box { background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); padding: 8px 20px; border-radius: 10px; border: 1px solid rgba(0,230,118,0.3); text-align: center; min-width: 90px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);}
+        .hud-label { font-size: 11px; color: #aaa; font-weight: bold; letter-spacing: 1px;}
+        .hud-val { font-size: 22px; color: var(--primary); font-weight: bold; font-family: 'Press Start 2P', cursive; margin-top: 5px; text-shadow: 0 0 10px var(--primary);}
+
+        #ticket-notif { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); color: #00f2ff; font-family: 'Press Start 2P', cursive; font-size: 16px; text-shadow: 0 0 15px #00f2ff; display: none; transition: opacity 0.5s; z-index: 50; pointer-events: none; }
+
+        .menu-box { background: rgba(10, 10, 15, 0.8); backdrop-filter: blur(15px); padding: 40px; border-radius: 20px; text-align: center; pointer-events: auto; border: 1px solid rgba(0, 230, 118, 0.3); box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(0, 230, 118, 0.1); }
+        .menu-box h1 { font-family: 'Press Start 2P', cursive; color: var(--primary); font-size: 30px; margin-bottom: 15px; text-shadow: 0 0 15px var(--primary); }
+        .btn-play { background: linear-gradient(90deg, #00e676, #00b894); border: none; padding: 15px 40px; font-family: 'Outfit', sans-serif; font-weight: 800; color: #000; border-radius: 30px; cursor: pointer; font-size: 18px; margin-top: 15px; transition: 0.3s; text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 10px 20px rgba(0, 230, 118, 0.3);}
+        .btn-play:hover { box-shadow: 0 10px 30px rgba(0, 230, 118, 0.6); transform: translateY(-3px); }
+        .hide { display: none !important; }
+
+        .cg-toolbar { height: 60px; background: var(--cg-panel); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-radius: 0 0 12px 12px; }
+        .cg-tool-left { display: flex; align-items: center; gap: 15px; }
+        .cg-tool-left img { width: 35px; height: 35px; border-radius: 8px; object-fit: cover; filter: hue-rotate(100deg);}
+        .cg-tool-right { display: flex; gap: 8px; }
+        .cg-tool-btn { background: rgba(255,255,255,0.05); border: none; color: #ccc; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
+        .cg-tool-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+        @media (max-width: 900px) { .cg-sidebar { display: none; } }
+    </style>
+</head>
+<body>
+    <nav class="cg-navbar">
+        <a href="index.html" class="cg-logo"><i class="fas fa-gamepad" style="color: var(--cg-purple);"></i> CRAZY NOSTALGIA</a>
+        <div class="cg-nav-right">
+            <button class="cg-user-btn" id="nav-user-btn" onclick="window.location.href='login.html'">Đăng nhập</button>
+        </div>
+    </nav>
+
+    <div class="cg-layout">
+        <div class="cg-main">
+            <div class="cg-player-wrapper" id="game-player">
+                
+                <div class="cg-block-screen" id="block-screen">
+                    <i class="fas fa-lock"></i>
+                    <h2>TÍNH NĂNG VIP</h2>
+                    <p>Tài khoản Khách không được phép chơi tựa game này. Vui lòng đăng nhập hoặc tạo tài khoản để trải nghiệm!</p>
+                    <button class="btn-login-redirect" onclick="window.location.href='login.html'">Đăng Nhập Ngay</button>
+                </div>
+
+                <div class="cg-loading" id="loading-overlay">
+                    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500" class="cg-thumb">
+                    <h2>Snake Neon</h2>
+                    <div class="cg-bar-bg"><div class="cg-bar-fill" id="load-fill"></div></div>
+                    <div style="font-weight: bold; color: var(--primary)"><span id="load-text">0%</span></div>
+                </div>
+
+                <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+                <div class="game-ui">
+                    <div class="score-hud hide" id="score-hud">
+                        <div class="hud-box"><div class="hud-label">SCORE</div><div class="hud-val" id="score">0</div></div>
+                        <div class="hud-box"><div class="hud-label">BEST</div><div class="hud-val" id="best">0</div></div>
+                    </div>
+                    
+                    <div id="ticket-notif">+1 VÉ VÀNG!</div>
+
+                    <div class="menu-box hide" id="start-screen">
+                        <h1>SNAKE NEON</h1>
+                        <p style="color:#aaa; font-size:14px; margin-bottom:20px;">Ăn 1 Táo rớt 5 Xu!<br><span style="color:#00f2ff;">(Có 5% tỷ lệ rớt Vé Vàng)</span></p>
+                        <button class="btn-play" id="btn-start-game">KHỞI ĐỘNG</button>
+                    </div>
+
+                    <div class="menu-box hide" id="game-over-screen">
+                        <h1 style="color: #ff4757; text-shadow: 0 0 20px #ff4757;">GAME OVER</h1>
+                        <div id="coin-reward" style="color: #f1c40f; font-size: 20px; font-weight: bold; margin: 20px 0; text-shadow: 0 0 10px #f1c40f;">+0 Coins</div>
+                        <button class="btn-play" id="btn-restart-game">CHƠI LẠI</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cg-toolbar">
+                <div class="cg-tool-left">
+                    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=100" style="filter: hue-rotate(100deg);">
+                    <h3 style="font-size: 16px;">Snake Neon</h3>
+                </div>
+                <div class="cg-tool-right">
+                    <button class="cg-tool-btn" onclick="toggleFullscreen()" title="Toàn màn hình"><i class="fas fa-expand"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="cg-sidebar">
+            <h3>🔥 Trò chơi nổi bật</h3>
+            <div class="cg-games-list">
+                <div class="cg-game-item" onclick="window.location.href='flappy.html'">
+                    <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=200" class="cg-game-thumb">
+                    <div class="cg-game-info"><div class="cg-game-title">Cyber Bird</div><div class="cg-game-cate">Kỹ năng</div></div>
+                </div>
+                <div class="cg-game-item" onclick="window.location.href='pacman.html'">
+                    <img src="https://images.unsplash.com/photo-1612404730960-5c71577fca11?w=200" class="cg-game-thumb" style="filter: hue-rotate(40deg);">
+                    <div class="cg-game-info"><div class="cg-game-title">Pac-Man Retro</div><div class="cg-game-cate">Hành động</div></div>
+                </div>
+                <div class="cg-game-item" onclick="window.location.href='2048.html'">
+                    <img src="https://images.unsplash.com/photo-1614332287897-cdc485fa562d?w=200" class="cg-game-thumb">
+                    <div class="cg-game-info"><div class="cg-game-title">2048 Ultimate</div><div class="cg-game-cate">Logic</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleFullscreen() {
+            let elem = document.getElementById("game-player");
+            if (!document.fullscreenElement) elem.requestFullscreen().catch(err => {}); else document.exitFullscreen();
+        }
+
+        window.onload = () => {
+            let progress = 0;
+            let interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 20) + 10;
+                if(progress >= 100) {
+                    progress = 100; clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('loading-overlay').style.opacity = '0';
+                        setTimeout(() => { 
+                            document.getElementById('loading-overlay').style.display = 'none'; 
+                            if(!isGuestUser) document.getElementById('start-screen').classList.remove('hide');
+                        }, 500);
+                    }, 300);
+                }
+                document.getElementById('load-fill').style.width = progress + '%';
+                document.getElementById('load-text').innerText = progress + '%';
+            }, 150);
+        };
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const box = 20; 
+
+        let userData = JSON.parse(localStorage.getItem('currentUser'));
+        let isGuestUser = (!userData || userData.isGuest === true || userData.username === 'Guest');
+        
+        let userBtn = document.getElementById('nav-user-btn');
+        if(isGuestUser) {
+            userBtn.classList.add('login-mode');
+            userBtn.innerHTML = 'Đăng nhập';
+            document.getElementById('block-screen').style.display = 'flex';
+        } else {
+            userBtn.innerHTML = `<i class="fas fa-user-circle"></i> ${userData.username}`;
+            userBtn.onclick = null; 
+            document.getElementById('best').innerText = userData.snake_best || 0;
+        }
+
+        const Game = {
+            snake: [], food: {}, score: 0, d: '', timer: null, state: 'start', frames: 0,
+            start() {
+                if(this.state === 'playing') return;
+                this.state = 'playing';
+                document.getElementById('start-screen').classList.add('hide'); document.getElementById('game-over-screen').classList.add('hide');
+                document.getElementById('score-hud').classList.remove('hide');
+                this.snake = []; this.snake[0] = { x: 10 * box, y: 10 * box };
+                this.score = 0; this.d = "RIGHT"; this.frames = 0;
+                document.getElementById('score').innerText = this.score;
+                this.spawnFood(); clearInterval(this.timer);
+                this.timer = setInterval(this.draw.bind(this), 120); 
+            },
+            spawnFood() { this.food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box }; },
+            collision(head, array) {
+                for(let i = 0; i < array.length; i++) { if(head.x == array[i].x && head.y == array[i].y) return true; } return false;
+            },
+            draw() {
+                this.frames++;
+                
+                ctx.fillStyle = "#12151e";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                for (let i = 0; i < canvas.width / box; i++) {
+                    for (let j = 0; j < canvas.height / box; j++) {
+                        if ((i + j) % 2 === 0) {
+                            ctx.fillStyle = "rgba(255, 255, 255, 0.03)";
+                        } else {
+                            ctx.fillStyle = "rgba(255, 255, 255, 0.01)";
+                        }
+                        ctx.fillRect(i * box, j * box, box, box);
+                    }
+                }
+                
+                ctx.strokeStyle = "rgba(0, 230, 118, 0.15)"; 
+                ctx.lineWidth = 1;
+                for(let i=0; i<=canvas.width; i+=box) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke(); }
+                for(let i=0; i<=canvas.height; i+=box) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke(); }
+
+                for(let i = 0; i < this.snake.length; i++) {
+                    ctx.fillStyle = (i == 0) ? "#fff" : "#00e676";
+                    ctx.shadowBlur = (i == 0) ? 20 : 10;
+                    ctx.shadowColor = "#00e676";
+                    ctx.beginPath(); ctx.roundRect(this.snake[i].x + 1, this.snake[i].y + 1, box - 2, box - 2, 4); ctx.fill();
+                }
+
+                let pulse = Math.abs(Math.sin(this.frames * 0.5)) * 10;
+                ctx.fillStyle = "#ff007a"; ctx.shadowBlur = 15 + pulse; ctx.shadowColor = "#ff007a";
+                ctx.beginPath(); ctx.arc(this.food.x + box/2, this.food.y + box/2, box/2 - 3, 0, Math.PI*2); ctx.fill();
+                ctx.shadowBlur = 0;
+
+                let snakeX = this.snake[0].x; let snakeY = this.snake[0].y;
+                if(this.d == "LEFT") snakeX -= box; if(this.d == "UP") snakeY -= box;
+                if(this.d == "RIGHT") snakeX += box; if(this.d == "DOWN") snakeY += box;
+
+                if(snakeX == this.food.x && snakeY == this.food.y) {
+                    this.score += 10; document.getElementById('score').innerText = this.score; this.spawnFood();
+
+                    if(!isGuestUser) {
+                        let rand = Math.floor(Math.random() * 100) + 1;
+                        if(rand <= 5) { // Đã chỉnh tỷ lệ xuống 5%
+                            userData.tickets = (userData.tickets || 0) + 1;
+                            localStorage.setItem('currentUser', JSON.stringify(userData));
+                            localStorage.setItem('user_' + userData.username, JSON.stringify(userData));
+                            
+                            let notif = document.getElementById('ticket-notif');
+                            notif.style.display = 'block';
+                            notif.style.opacity = 1;
+                            setTimeout(() => { 
+                                notif.style.opacity = 0; 
+                                setTimeout(() => { notif.style.display = 'none'; }, 500);
+                            }, 1500);
+                        }
+                    }
+                } else { this.snake.pop(); }
+
+                let newHead = { x: snakeX, y: snakeY };
+                if(snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || this.collision(newHead, this.snake)) {
+                    clearInterval(this.timer); this.gameOver(); return;
+                }
+                this.snake.unshift(newHead);
+            },
+            gameOver() {
+                this.state = 'over';
+                document.getElementById('score-hud').classList.add('hide');
+                document.getElementById('game-over-screen').classList.remove('hide');
+                
+                let earnedCoins = Math.floor(this.score / 10) * 5;
+                if(!isGuestUser) {
+                    if(this.score > (userData.snake_best || 0)) { userData.snake_best = this.score; document.getElementById('best').innerText = this.score; }
+                    if(this.score > (userData.snake_mission || 0)) { userData.snake_mission = this.score; }
+
+                    userData.coins = (userData.coins || 0) + earnedCoins;
+                    localStorage.setItem('currentUser', JSON.stringify(userData));
+                    localStorage.setItem('user_' + userData.username, JSON.stringify(userData));
+                    document.getElementById('coin-reward').innerText = `+${earnedCoins} Coins`;
+                }
+            }
+        };
+
+        if (!isGuestUser) {
+            document.getElementById('btn-start-game').addEventListener('click', () => Game.start());
+            document.getElementById('btn-restart-game').addEventListener('click', () => Game.start());
+
+            document.addEventListener('keydown', e => {
+                if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) e.preventDefault();
+                if(Game.state !== 'playing') { if(e.code === 'Space') Game.start(); return; }
+                if(e.keyCode == 37 && Game.d != "RIGHT") Game.d = "LEFT";
+                else if(e.keyCode == 38 && Game.d != "DOWN") Game.d = "UP";
+                else if(e.keyCode == 39 && Game.d != "LEFT") Game.d = "RIGHT";
+                else if(e.keyCode == 40 && Game.d != "UP") Game.d = "DOWN";
+            });
+
+            let tX = 0, tY = 0;
+            document.addEventListener('touchstart', e => { tX = e.changedTouches[0].screenX; tY = e.changedTouches[0].screenY; }, {passive: false});
+            document.addEventListener('touchend', e => {
+                if(e.target.tagName === 'BUTTON' || e.target.tagName === 'A') return;
+                e.preventDefault(); if(Game.state !== 'playing') return;
+                let dx = e.changedTouches[0].screenX - tX; let dy = e.changedTouches[0].screenY - tY;
+                if(Math.abs(dx) > Math.abs(dy)) {
+                    if(dx > 30 && Game.d != "LEFT") Game.d = "RIGHT"; else if(dx < -30 && Game.d != "RIGHT") Game.d = "LEFT";
+                } else {
+                    if(dy > 30 && Game.d != "UP") Game.d = "DOWN"; else if(dy < -30 && Game.d != "DOWN") Game.d = "UP";
+                }
+            }, {passive: false});
+        }
+    </script>
+</body>
+</html>

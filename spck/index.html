@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nostalgia Gaming | Cổng Game Giải Trí</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --cg-bg: #0b0c10; --cg-panel: #161822; --cg-hover: #202330;
+            --primary: #5865F2; --accent: #00e676; --gold: #f1c40f; --purple: #8e2de2;
+            --text-main: #ffffff; --text-muted: #8b92a5;
+        }
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; user-select: none; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+        body { background-color: var(--cg-bg); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* TOP NAVBAR */
+        .top-navbar { height: 70px; background: rgba(22, 24, 34, 0.8); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; z-index: 50; }
+        .app-logo { font-family: 'Rajdhani', sans-serif; font-size: 26px; font-weight: 700; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 10px; letter-spacing: 1px; }
+        .app-logo i { color: var(--purple); font-size: 28px; }
+        
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        .currency-pill { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 30px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .currency-pill.coin { color: var(--gold); border-color: rgba(241, 196, 15, 0.3); }
+        .currency-pill.coin:hover { background: rgba(241, 196, 15, 0.1); }
+        .currency-pill.ticket { color: #00f2ff; border-color: rgba(0, 242, 255, 0.3); }
+        .currency-pill.ticket:hover { background: rgba(0, 242, 255, 0.1); }
+        
+        .user-profile { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05); padding: 6px 15px 6px 6px; border-radius: 30px; cursor: pointer; transition: 0.3s; border: 1px solid rgba(255,255,255,0.05); }
+        .user-profile:hover { background: rgba(255,255,255,0.1); }
+        .avatar-img { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), #4a00e0); display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; color: white; border: 2px solid transparent; }
+        .user-info { display: flex; flex-direction: column; }
+        .username { font-size: 14px; font-weight: bold; line-height: 1; }
+        .user-title-display { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 3px; border-radius: 4px; padding: 2px 5px; display: inline-block; width: max-content; }
+
+        .btn-login-nav { background: linear-gradient(135deg, var(--purple), #4a00e0); color: white; border: none; padding: 10px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.3s; }
+        .btn-login-nav:hover { box-shadow: 0 0 15px rgba(142, 45, 226, 0.5); transform: translateY(-2px); }
+
+        /* BODY LAYOUT */
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        
+        /* LEFT SIDEBAR */
+        .sidebar { width: 80px; background: var(--cg-panel); display: flex; flex-direction: column; align-items: center; padding: 25px 0; border-right: 1px solid rgba(255,255,255,0.05); z-index: 40; }
+        .nav-item { width: 45px; height: 45px; border-radius: 12px; display: flex; justify-content: center; align-items: center; margin-bottom: 15px; cursor: pointer; color: var(--text-muted); font-size: 20px; transition: 0.3s; position: relative; }
+        .nav-item:hover { color: #fff; background: rgba(255,255,255,0.1); transform: scale(1.1); }
+        .nav-item.active { background: linear-gradient(135deg, var(--primary), #8e2de2); color: white; box-shadow: 0 0 15px rgba(88, 101, 242, 0.4); }
+
+        /* CONTENT AREA */
+        .content-area { flex: 1; overflow-y: auto; padding: 30px 40px; scroll-behavior: smooth; }
+
+        /* HERO BANNER */
+        .hero-banner { width: 100%; height: 350px; border-radius: 20px; background: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200') center/cover; position: relative; overflow: hidden; margin-bottom: 40px; display: flex; align-items: flex-end; padding: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(11, 12, 16, 1) 0%, rgba(11, 12, 16, 0.2) 60%, transparent 100%); }
+        .hero-content { position: relative; z-index: 10; max-width: 600px; }
+        .hero-tag { background: #ff4757; color: white; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: inline-block; }
+        .hero-title { font-family: 'Rajdhani', sans-serif; font-size: 45px; font-weight: 800; line-height: 1.1; margin-bottom: 15px; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .hero-btn { background: var(--accent); color: #000; border: none; padding: 12px 35px; border-radius: 30px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+        .hero-btn:hover { box-shadow: 0 0 20px var(--accent); transform: scale(1.05); }
+
+        /* GAME GRID */
+        .section-title { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .section-title i { color: #ff4757; }
+        
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding-bottom: 50px; }
+        .game-card { border-radius: 16px; overflow: hidden; position: relative; cursor: pointer; aspect-ratio: 16/9; background: var(--cg-panel); border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .game-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s cubic-bezier(0.1, 0.7, 0.1, 1); }
+        
+        .game-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.1) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; transition: 0.3s; }
+        .play-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.5); width: 60px; height: 60px; background: var(--primary); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; color: white; opacity: 0; transition: 0.3s cubic-bezier(0.1, 0.7, 0.1, 1); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .play-icon i { margin-left: 5px; }
+        
+        .game-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.2); }
+        .game-card:hover img { transform: scale(1.1); }
+        .game-card:hover .game-overlay { background: rgba(0,0,0,0.6); }
+        .game-card:hover .play-icon { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+        .game-info h3 { font-size: 18px; font-weight: 700; margin-bottom: 5px; color: #fff; }
+        .game-tag { font-size: 11px; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 4px; color: #ddd; text-transform: uppercase; font-weight: bold; }
+
+        .locked-card { filter: grayscale(100%); pointer-events: none; }
+        .locked-card .game-overlay { background: rgba(0,0,0,0.8); justify-content: center; align-items: center; }
+        .locked-msg { color: #ff4757; font-weight: bold; font-size: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .locked-msg i { font-size: 30px; }
+
+        /* GLASSMORPHISM MODALS */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 100; display: none; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.3s ease-out; }
+        .modal-box { width: 650px; max-width: 95%; max-height: 85vh; overflow-y: auto; background: rgba(22, 24, 34, 0.9); backdrop-filter: blur(20px); border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); padding: 35px; position: relative; box-shadow: 0 30px 60px rgba(0,0,0,0.6); }
+        .modal-box::-webkit-scrollbar { width: 6px; }
+        .modal-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        
+        .close-btn { position: absolute; top: 20px; right: 25px; color: #8b92a5; cursor: pointer; font-size: 28px; transition: 0.2s; z-index: 10; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; border-radius: 50%; background: rgba(255,255,255,0.05); }
+        .close-btn:hover { color: #fff; background: #ff4757; transform: rotate(90deg); }
+        
+        .modal-title { font-family: 'Rajdhani', sans-serif; font-size: 28px; font-weight: 800; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
+
+        /* MISSIONS */
+        .mission-category { color: var(--gold); font-size: 13px; font-weight: bold; text-transform: uppercase; margin: 25px 0 10px 0; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;}
+        .mission-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 15px 20px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.03); transition: 0.3s; }
+        .mission-item:hover { border-color: rgba(255,255,255,0.1); background: rgba(0,0,0,0.5); }
+        .mission-info h4 { margin: 0 0 8px 0; color: white; font-size: 15px; }
+        .mission-reward { color: var(--gold); font-weight: bold; font-size: 12px; display: inline-flex; align-items: center; gap: 5px; background: rgba(241, 196, 15, 0.1); padding: 4px 10px; border-radius: 20px; margin-right: 8px;}
+        .mission-reward.ticket { color: #00f2ff; background: rgba(0, 242, 255, 0.1); }
+        
+        .btn-claim { background: var(--primary); border: none; color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; opacity: 0.5; pointer-events: none; transition: 0.2s; }
+        .btn-claim.ready { opacity: 1; pointer-events: all; background: linear-gradient(135deg, var(--primary), var(--purple)); box-shadow: 0 5px 15px rgba(88, 101, 242, 0.3); }
+        .btn-claim.ready:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(88, 101, 242, 0.5); }
+        .btn-claim.claimed { background: rgba(46, 204, 113, 0.2); color: #2ecc71; opacity: 1; }
+        
+        .btn-refresh { background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.3); padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+        .btn-refresh:hover { background: #ff4757; color: #fff; }
+
+        /* SHOP */
+        .shop-tabs { display: flex; gap: 15px; margin-bottom: 25px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 12px; }
+        .shop-tab { flex: 1; padding: 12px; background: transparent; border: none; border-radius: 8px; color: var(--text-muted); font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .shop-tab.active { background: rgba(255,255,255,0.1); color: #fff; }
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .shop-item { background: rgba(0,0,0,0.4); padding: 25px 20px; border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .shop-item:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.1); }
+        .title-badge { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; }
+        .btn-buy { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 8px; background: var(--gold); color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 14px;}
+        .btn-buy:hover { box-shadow: 0 5px 15px rgba(241, 196, 15, 0.4); }
+        .btn-buy:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; }
+        .btn-equip { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid var(--accent); border-radius: 8px; background: rgba(0, 230, 118, 0.1); color: var(--accent); font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .btn-equip:hover { background: var(--accent); color: #000; }
+        .btn-equipped { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 8px; background: rgba(255,255,255,0.1); color: #fff; font-weight: bold; pointer-events: none; }
+
+        /* LUCKY SPIN */
+        .wheel-wrapper { position: relative; display: flex; justify-content: center; align-items: center; margin: 20px 0 40px 0; }
+        .wheel-container { position: relative; width: 320px; height: 320px; }
+        .wheel { width: 100%; height: 100%; border-radius: 50%; border: 6px solid var(--gold); background: conic-gradient(#ff4757 0deg 60deg, #ffa502 60deg 120deg, #2ecc71 120deg 180deg, #1e90ff 180deg 240deg, #9b59b6 240deg 300deg, #34495e 300deg 360deg); transition: transform 4s cubic-bezier(0.1, 0.7, 0.1, 1); position: relative; overflow: hidden; box-shadow: 0 0 40px rgba(241, 196, 15, 0.3); }
+        .wheel-text { position: absolute; top: 20px; left: 50%; transform-origin: 50% 140px; font-weight: bold; color: white; font-size: 16px; text-shadow: 1px 1px 3px #000; transform: translateX(-50%); width: 80px; text-align: center; }
+        .txt-1 { transform: translateX(-50%) rotate(30deg); } .txt-2 { transform: translateX(-50%) rotate(90deg); } .txt-3 { transform: translateX(-50%) rotate(150deg); }
+        .txt-4 { transform: translateX(-50%) rotate(210deg); } .txt-5 { transform: translateX(-50%) rotate(270deg); } .txt-6 { transform: translateX(-50%) rotate(330deg); font-size: 26px; }
+        .wheel-pointer { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid white; z-index: 10; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
+        .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background: #fff; border-radius: 50%; z-index: 5; border: 4px solid var(--gold); box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        
+        .spin-controls { display: flex; justify-content: center; }
+        .btn-spin { background: linear-gradient(135deg, var(--purple), #ff007a); border: none; padding: 15px 50px; border-radius: 30px; font-weight: 800; color: #fff; cursor: pointer; font-size: 18px; transition: 0.3s; box-shadow: 0 10px 20px rgba(142, 45, 226, 0.4); text-transform: uppercase; letter-spacing: 2px;}
+        .btn-spin:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(142, 45, 226, 0.6); }
+
+        @keyframes fadeIn { from { opacity: 0; backdrop-filter: blur(0px); } to { opacity: 1; backdrop-filter: blur(8px); } }
+        @keyframes borderGlow { 0% { border-color: #ff4757; box-shadow: 0 0 15px #ff4757; } 33% { border-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; } 66% { border-color: #00f2ff; box-shadow: 0 0 15px #00f2ff; } 100% { border-color: #ff4757; box-shadow: 0 0 15px #ff4757; } }
+    </style>
+</head>
+<body>
+
+    <nav class="top-navbar">
+        <a href="index.html" class="app-logo"><i class="fas fa-gamepad"></i> CRAZY NOSTALGIA</a>
+        <div class="nav-right">
+            <div id="currency-display" style="display: none; gap: 15px;">
+                <div class="currency-pill ticket" onclick="openModal('spin')" title="Tới Vòng Quay">
+                    <i class="fas fa-ticket-alt"></i> <span id="ticket-display">0</span>
+                </div>
+                <div class="currency-pill coin">
+                    <i class="fas fa-coins"></i> <span id="coin-display">0</span>
+                </div>
+            </div>
+            
+            <div id="user-display">
+                <button class="btn-login-nav" onclick="window.location.href='login.html'">Đăng nhập / Đăng ký</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-layout">
+        <div class="sidebar">
+            <div class="nav-item active" onclick="closeAllModals(this)" title="Trang chủ"><i class="fas fa-home"></i></div>
+            <div class="nav-item" onclick="openModal('mission', this)" title="Nhiệm Vụ"><i class="fas fa-tasks"></i></div>
+            <div class="nav-item" onclick="openModal('shop', this)" title="Cửa Hàng"><i class="fas fa-shopping-cart"></i></div>
+            <div class="nav-item" onclick="openModal('spin', this)" title="Vòng Quay"><i class="fas fa-dharmachakra"></i></div>
+            
+            <div class="nav-item" onclick="playGame('mystery.html')" title="Gacha VIP & Hack"><i class="fas fa-box-open"></i></div>
+            
+            <div class="nav-item" onclick="confirmLogout()" style="margin-top: auto;" title="Đăng Xuất"><i class="fas fa-sign-out-alt"></i></div>
+        </div>
+
+        <div class="content-area">
+            
+            <div class="hero-banner">
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <div class="hero-tag">Trò Chơi Của Tuần</div>
+                    <h1 class="hero-title">Cyber Bird:<br>Chinh Phục Bầu Trời</h1>
+                    <p style="margin-bottom: 25px; color: #ddd; font-size: 16px;">Tốc độ tăng dần, độ khó kịch trần. Bay qua ống để nhận ngay Xu mỗi ngày!</p>
+                    <button class="hero-btn" onclick="playGame('flappy.html')"><i class="fas fa-play"></i> CHƠI NGAY</button>
+                </div>
+            </div>
+
+            <h2 class="section-title"><i class="fas fa-fire"></i> Đang Thịnh Hành</h2>
+            <div class="game-grid">
+                
+                <div class="game-card" id="game-pacman" onclick="playGame('pacman.html')">
+                    <img src="https://images.unsplash.com/photo-1612404730960-5c71577fca11?w=600" style="filter: hue-rotate(40deg);">
+                    <div class="game-overlay">
+                        <div class="play-icon"><i class="fas fa-play"></i></div>
+                        <div class="game-info">
+                            <span class="game-tag">Hành động</span>
+                            <h3>Pac-Man Retro</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-card" id="game-snake" onclick="playGame('snake.html')">
+                    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600" style="filter: hue-rotate(100deg);">
+                    <div class="game-overlay">
+                        <div class="play-icon"><i class="fas fa-play"></i></div>
+                        <div class="game-info">
+                            <span class="game-tag">Cổ điển</span>
+                            <h3>Snake Xenzia</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-card" onclick="playGame('2048.html', true)">
+                    <img src="https://images.unsplash.com/photo-1614332287897-cdc485fa562d?w=600">
+                    <div class="game-overlay">
+                        <div class="play-icon"><i class="fas fa-play"></i></div>
+                        <div class="game-info">
+                            <span class="game-tag">Logic</span>
+                            <h3>2048 Ultimate</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-card" onclick="playGame('memory.html', true)">
+                    <img src="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=600">
+                    <div class="game-overlay">
+                        <div class="play-icon"><i class="fas fa-play"></i></div>
+                        <div class="game-info">
+                            <span class="game-tag">Trí tuệ</span>
+                            <h3>Memory Master</h3>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-mission">
+        <div class="modal-box">
+            <span class="close-btn" onclick="closeModal('mission')">&times;</span>
+            <div class="modal-title">
+                <div><i class="fas fa-tasks" style="color: var(--accent);"></i> Nhiệm Vụ Hằng Ngày</div>
+                <button class="btn-refresh" onclick="refreshMissions()"><i class="fas fa-sync-alt"></i> Mới (-100 Xu)</button>
+            </div>
+            <div id="mission-list"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-shop">
+        <div class="modal-box" style="width: 900px;">
+            <span class="close-btn" onclick="closeModal('shop')">&times;</span>
+            <div class="modal-title">
+                <div><i class="fas fa-store" style="color: var(--gold);"></i> Cửa Hàng Vật Phẩm</div>
+            </div>
+            
+            <div class="shop-tabs">
+                <button class="shop-tab active" onclick="switchShopTab('titles')">Danh Hiệu</button>
+                <button class="shop-tab" onclick="switchShopTab('frames')">Khung Viền Avatar</button>
+            </div>
+            <div class="shop-grid" id="shop-list"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-spin">
+        <div class="modal-box" style="text-align: center;">
+            <span class="close-btn" onclick="closeModal('spin')">&times;</span>
+            <div class="modal-title" style="justify-content: center; border:none; margin-bottom: 5px;">
+                <div><i class="fas fa-dharmachakra" style="color: var(--purple);"></i> Vòng Quay Nhân Phẩm</div>
+            </div>
+            
+            <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 10px;">
+                Cày nhiệm vụ để kiếm <span style="color:#00f2ff; font-weight:bold;">Vé Quay</span> nhé!
+            </p>
+
+            <div class="wheel-wrapper">
+                <div class="wheel-container">
+                    <div class="wheel-pointer"></div>
+                    <div class="wheel-center"></div>
+                    <div class="wheel" id="spin-wheel">
+                        <div class="wheel-text txt-1">100 Xu</div>
+                        <div class="wheel-text txt-2">200 Xu</div>
+                        <div class="wheel-text txt-3">300 Xu</div>
+                        <div class="wheel-text txt-4">500 Xu</div>
+                        <div class="wheel-text txt-5">1000 Xu</div>
+                        <div class="wheel-text txt-6">❓</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spin-controls">
+                <button class="btn-spin" onclick="spinWheel()">QUAY (1 Vé)</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userData = {};
+        let currentShopTab = 'titles';
+        let currentRotation = 0;
+        let isSpinning = false;
+
+        const shopTitles = [
+            { id: 't_newbie', name: 'Tân Binh', price: 100, color: '#95a5a6' },
+            { id: 't_gamer', name: 'Tay Chơi', price: 500, color: '#2ecc71' },
+            { id: 't_master', name: 'Cao Thủ', price: 1500, color: '#3498db' },
+            { id: 't_legend', name: 'Huyền Thoại', price: 3000, color: '#9b59b6' },
+            { id: 't_king', name: 'Vua Trò Chơi', price: 5000, color: '#f1c40f' },
+            { id: 't_destroyer', name: 'Kẻ Hủy Diệt', price: 10000, color: '#e67e22' },
+            { id: 't_prodigy', name: 'Thần Đồng', price: 20000, color: '#ff9ff3' },
+            { id: 't_god', name: 'Độc Cô Cầu Bại', price: 50000, color: '#ff4757' }
+        ];
+
+        const shopFrames = [
+            { id: 'f_neon_blue', name: 'Neon Xanh', price: 200, style: 'box-shadow: 0 0 10px #00f2ff, 0 0 20px #00f2ff; border: 2px solid #00f2ff;' },
+            { id: 'f_neon_red', name: 'Neon Đỏ', price: 500, style: 'box-shadow: 0 0 10px #ff4757, 0 0 20px #ff4757; border: 2px solid #ff4757;' },
+            { id: 'f_nature', name: 'Mộc Độn', price: 1000, style: 'box-shadow: 0 0 10px #2ecc71, 0 0 20px #2ecc71; border: 2px solid #2ecc71;' },
+            { id: 'f_gold', name: 'Hoàng Kim', price: 2500, style: 'box-shadow: 0 0 15px #f1c40f, 0 0 30px #f1c40f; border: 3px solid #f1c40f;' },
+            { id: 'f_diamond', name: 'Kim Cương', price: 5000, style: 'box-shadow: 0 0 15px #7efff5, 0 0 30px #7efff5; border: 3px solid #7efff5;' },
+            { id: 'f_dark', name: 'Vực Thẳm', price: 8000, style: 'box-shadow: 0 0 15px #1e272e, 0 0 30px #1e272e; border: 3px solid #000;' },
+            { id: 'f_pink', name: 'Hường Phấn', price: 12000, style: 'box-shadow: 0 0 15px #ff9ff3, 0 0 30px #ff9ff3; border: 3px solid #ff9ff3;' },
+            { id: 'f_rainbow', name: 'Cầu Vồng', price: 20000, style: 'animation: borderGlow 2s linear infinite; border: 2px solid transparent;' },
+            { id: 'f_matrix', name: 'Ma Trận', price: 35000, style: 'box-shadow: 0 0 20px #00e676; border: 2px dotted #00e676;' },
+            { id: 'f_cyber', name: 'Cyberpunk', price: 50000, style: 'box-shadow: -5px 0 15px #00f2ff, 5px 0 15px #bc13fe; border-left: 3px solid #00f2ff; border-right: 3px solid #bc13fe; border-top: 3px solid transparent; border-bottom: 3px solid transparent;' }
+        ];
+
+        function initApp() {
+            const userJson = localStorage.getItem('currentUser');
+            
+            if(!userJson || JSON.parse(userJson).isGuest === true || JSON.parse(userJson).username === 'Guest') { 
+                userData = { isGuest: true, username: 'Guest' };
+                document.getElementById('user-display').innerHTML = `<button class="btn-login-nav" onclick="window.location.href='login.html'">Đăng nhập / Đăng ký</button>`;
+                document.getElementById('currency-display').style.display = 'none';
+                
+                document.getElementById('game-pacman').classList.add('locked-card');
+                document.getElementById('game-pacman').querySelector('.game-overlay').innerHTML = `<div class="locked-msg"><i class="fas fa-lock"></i> Đăng nhập để chơi</div>`;
+                
+                document.getElementById('game-snake').classList.add('locked-card');
+                document.getElementById('game-snake').querySelector('.game-overlay').innerHTML = `<div class="locked-msg"><i class="fas fa-lock"></i> Đăng nhập để chơi</div>`;
+                
+            } else {
+                userData = JSON.parse(userJson);
+                
+                document.getElementById('currency-display').style.display = 'flex';
+                document.getElementById('user-display').innerHTML = `
+                    <div class="user-profile" onclick="window.location.href='#'">
+                        <div class="user-info">
+                            <span class="username">${userData.username}</span>
+                            <span class="user-title-display" id="user-title-display" style="display:none;">Danh hiệu</span>
+                        </div>
+                        <div class="avatar-img" id="avatar-display">${userData.username.charAt(0).toUpperCase()}</div>
+                    </div>
+                `;
+
+                userData.flappy_best = userData.flappy_best || 0;
+                userData.snake_best = userData.snake_best || 0;
+                userData.pacman_best = userData.pacman_best || 0;
+                userData.pacman_wins = userData.pacman_wins || 0;
+                userData['2048_best'] = userData['2048_best'] || 0;
+                userData.memory_wins_normal_hard = userData.memory_wins_normal_hard || 0;
+                userData.memory_best_moves = userData.memory_best_moves || 9999;
+
+                userData.flappy_mission = userData.flappy_mission || 0;
+                userData.snake_mission = userData.snake_mission || 0;
+                userData.pacman_wins_mission = userData.pacman_wins_mission || 0;
+                userData.pacman_kills_mission = userData.pacman_kills_mission || 0;
+                userData['2048_score_mission'] = userData['2048_score_mission'] || 0;
+                userData['2048_tile_mission'] = userData['2048_tile_mission'] || 0;
+                userData.memory_wins_normal_hard_mission = userData.memory_wins_normal_hard_mission || 0;
+                userData.memory_moves_mission = userData.memory_moves_mission || 9999;
+
+                if(!userData.currentMissions || userData.currentMissions.length === 0 || typeof userData.currentMissions[0].reward !== 'object') {
+                    generateMissions();
+                }
+            }
+            
+            if(userData.tickets === undefined) userData.tickets = 0;
+            if(!userData.inventory) userData.inventory = [];
+            updateUI();
+        }
+
+        function generateMissions() {
+            const newMissions = [];
+            const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+            
+            let flappyTarget = rnd(20, 30);
+            newMissions.push({ id: 'm_flappy', game: 'Cyber Bird', title: `Bay qua ${flappyTarget} ống nước`, metric: 'flappy_mission', target: flappyTarget, claimed: false });
+
+            let snakeTarget = rnd(200, 500);
+            newMissions.push({ id: 'm_snake', game: 'Snake Xenzia', title: `Đạt ${snakeTarget} điểm`, metric: 'snake_mission', target: snakeTarget, claimed: false });
+
+            newMissions.push({ id: 'm_pac_win', game: 'Pac-Man Retro', title: `Thắng ${rnd(1, 3)} ván`, metric: 'pacman_wins_mission', target: rnd(1, 3), claimed: false });
+            newMissions.push({ id: 'm_pac_kill', game: 'Pac-Man Retro', title: `Tiêu diệt ${rnd(10, 20)} ma`, metric: 'pacman_kills_mission', target: rnd(10, 20), claimed: false });
+
+            newMissions.push({ id: 'm_2048_score', game: '2048 Ultimate', title: `Đạt ${rnd(1000, 2000)} điểm`, metric: '2048_score_mission', target: rnd(1000, 2000), claimed: false });
+            const tiles = [256, 512, 1024];
+            newMissions.push({ id: 'm_2048_tile', game: '2048 Ultimate', title: `Ghép được ô ${tiles[rnd(0, 2)]}`, metric: '2048_tile_mission', target: tiles[rnd(0, 2)], claimed: false });
+
+            let memWins = rnd(2, 4);
+            newMissions.push({ id: 'm_mem_win', game: 'Memory Master', title: `Thắng ${memWins} ván (Từ Vừa trở lên)`, metric: 'memory_wins_normal_hard_mission', target: memWins, claimed: false });
+            newMissions.push({ id: 'm_mem_moves', game: 'Memory Master', title: `Dưới ${rnd(15, 25)} bước`, metric: 'memory_moves_mission', target: rnd(15, 25), claimed: false, reverse: true });
+
+            newMissions.forEach(m => { m.reward = { coins: rnd(50, 300), tickets: 0 }; });
+            let numTicketMissions = rnd(1, 2);
+            let shuffled = [...newMissions].sort(() => 0.5 - Math.random());
+            for(let i=0; i<numTicketMissions; i++) {
+                shuffled[i].reward.tickets = rnd(1, 2);
+            }
+
+            userData.currentMissions = newMissions;
+            saveUser();
+        }
+
+        function refreshMissions() {
+            if(userData.isGuest) return alert("Tính năng này chỉ dành cho thành viên chính thức!");
+            if(userData.coins < 100) return alert("Bạn không đủ 100 Xu!");
+            
+            if(confirm("Tốn 100 Xu để làm mới nhiệm vụ?\n(Tiến độ nhiệm vụ hiện tại sẽ bị xóa để cày lại)")) {
+                userData.coins -= 100;
+                
+                userData.flappy_mission = 0; 
+                userData.snake_mission = 0; 
+                userData.pacman_wins_mission = 0; 
+                userData.pacman_kills_mission = 0; 
+                userData['2048_score_mission'] = 0; 
+                userData['2048_tile_mission'] = 0; 
+                userData.memory_wins_normal_hard_mission = 0;
+                userData.memory_moves_mission = 9999; 
+
+                generateMissions(); 
+                updateUI();
+            }
+        }
+
+        function claimReward(missionId) {
+            if(userData.isGuest) return;
+            let mission = userData.currentMissions.find(m => m.id === missionId);
+            
+            if(mission && !mission.claimed) {
+                mission.claimed = true;
+                
+                userData.coins = (userData.coins || 0) + mission.reward.coins;
+                if(mission.reward.tickets > 0) {
+                    userData.tickets = (userData.tickets || 0) + mission.reward.tickets;
+                }
+
+                if(mission.metric === 'memory_moves_mission') {
+                    userData[mission.metric] = 9999;
+                } else {
+                    userData[mission.metric] = 0;
+                }
+
+                saveUser(); updateUI();
+            }
+        }
+
+        function spinWheel() {
+            if(userData.isGuest) return alert("Tính năng dành cho người đăng kí!");
+            if(isSpinning) return;
+            if(userData.tickets < 1) return alert("Bạn không có Vé Quay! Hoàn thành nhiệm vụ để nhận thêm vé nhé.");
+            
+            isSpinning = true;
+            userData.tickets--; updateUI();
+
+            let rand = Math.random() * 100;
+            let prizeIndex;
+            if(rand < 40) prizeIndex = 0; 
+            else if(rand < 65) prizeIndex = 1; 
+            else if(rand < 80) prizeIndex = 2; 
+            else if(rand < 90) prizeIndex = 3; 
+            else if(rand < 95) prizeIndex = 4; 
+            else prizeIndex = 5; 
+
+            let targetAngle = 360 - (prizeIndex * 60 + 30);
+            let extraSpins = 5 * 360; 
+            currentRotation += extraSpins + targetAngle - (currentRotation % 360);
+            
+            document.getElementById('spin-wheel').style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => { handlePrize(prizeIndex); }, 4200);
+        }
+
+        function handlePrize(index) {
+            isSpinning = false;
+            const prizes = [100, 200, 300, 500, 1000, '?'];
+            let prize = prizes[index];
+            
+            if (prize !== '?') {
+                userData.coins += prize;
+                alert(`🎉 Chúc mừng! Bạn nhận được ${prize} Xu!`);
+            } else {
+                let mysteryRand = Math.random();
+                if(mysteryRand < 0.3) {
+                    userData.tickets += 2; 
+                    alert(`✨ Bất ngờ chưa! Bạn nhận được 2 Vé Quay!`);
+                } else if(mysteryRand < 0.65) {
+                    let unownedTitles = shopTitles.filter(t => !userData.inventory.includes(t.id));
+                    if(unownedTitles.length > 0) {
+                        let t = unownedTitles[Math.floor(Math.random() * unownedTitles.length)];
+                        userData.inventory.push(t.id);
+                        alert(`👑 Nhân phẩm bùng nổ! Trúng Danh hiệu: ${t.name}!`);
+                    } else {
+                        userData.coins += 2000; alert(`✨ Trúng Danh hiệu nhưng bạn đã có tất cả! Quy đổi thành 2000 Xu!`);
+                    }
+                } else {
+                    let unownedFrames = shopFrames.filter(f => !userData.inventory.includes(f.id));
+                    if(unownedFrames.length > 0) {
+                        let f = unownedFrames[Math.floor(Math.random() * unownedFrames.length)];
+                        userData.inventory.push(f.id);
+                        alert(`🖼️ Đỉnh kout! Trúng Khung viền: ${f.name}!`);
+                    } else {
+                        userData.coins += 2000; alert(`✨ Trúng Khung viền nhưng bạn đã có tất cả! Quy đổi thành 2000 Xu!`);
+                    }
+                }
+            }
+            saveUser(); updateUI();
+        }
+
+        function saveUser() {
+            if(userData.isGuest) return; 
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+            localStorage.setItem('user_' + userData.username, JSON.stringify(userData));
+        }
+
+        function updateUI() {
+            if(!userData.isGuest) {
+                document.getElementById('coin-display').innerText = userData.coins || 0;
+                document.getElementById('ticket-display').innerText = userData.tickets || 0;
+                
+                const avatarEl = document.getElementById('avatar-display');
+                if(avatarEl) avatarEl.innerText = userData.username.charAt(0).toUpperCase();
+                
+                if(userData.currentFrame) {
+                    let frame = shopFrames.find(f => f.id === userData.currentFrame);
+                    if(frame && avatarEl) avatarEl.style.cssText = frame.style + " transition: 0.3s;";
+                } else if(avatarEl) { avatarEl.style.cssText = "transition: 0.3s;"; }
+
+                const titleDisplay = document.getElementById('user-title-display');
+                if(userData.currentTitle && titleDisplay) {
+                    const titleInfo = shopTitles.find(t => t.id === userData.currentTitle);
+                    if(titleInfo) {
+                        titleDisplay.innerText = titleInfo.name; titleDisplay.style.color = '#000';
+                        titleDisplay.style.backgroundColor = titleInfo.color; titleDisplay.style.display = 'inline-block';
+                    }
+                } else if(titleDisplay) { titleDisplay.style.display = 'none'; }
+            }
+
+            renderMissions(); renderShop();
+        }
+
+        function renderMissions() {
+            const missionList = document.getElementById('mission-list');
+            missionList.innerHTML = '';
+            
+            if(userData.isGuest) {
+                missionList.innerHTML = '<p style="text-align:center; color:#888; padding: 30px 10px;">Vui lòng Đăng nhập để xem hệ thống nhiệm vụ đặc biệt!</p>';
+                return;
+            }
+
+            const grouped = {};
+            userData.currentMissions.forEach(m => {
+                if(!grouped[m.game]) grouped[m.game] = [];
+                grouped[m.game].push(m);
+            });
+
+            for(let game in grouped) {
+                let categoryHtml = `<div class="mission-category"><i class="fas fa-gamepad"></i> ${game}</div>`;
+                
+                grouped[game].forEach(m => {
+                    let isCompleted = m.reverse ? (userData[m.metric] <= m.target && userData[m.metric] > 0 && userData[m.metric] !== 9999) : ((userData[m.metric] || 0) >= m.target);
+                    let btnHtml = '';
+                    
+                    let rewardHtml = `<span class="mission-reward"><i class="fas fa-coins"></i> +${m.reward.coins}</span>`;
+                    if (m.reward.tickets > 0) {
+                        rewardHtml += `<span class="mission-reward ticket"><i class="fas fa-ticket-alt"></i> +${m.reward.tickets}</span>`;
+                    }
+                    
+                    if(m.claimed) btnHtml = `<button class="btn-claim claimed"><i class="fas fa-check"></i> Đã nhận</button>`;
+                    else if(isCompleted) btnHtml = `<button class="btn-claim ready" onclick="claimReward('${m.id}')">Nhận thưởng</button>`;
+                    else btnHtml = `<button class="btn-claim">Chưa đạt</button>`;
+
+                    categoryHtml += `
+                        <div class="mission-item">
+                            <div class="mission-info">
+                                <h4>${m.title}</h4>
+                                <div>${rewardHtml}</div>
+                            </div>
+                            ${btnHtml}
+                        </div>`;
+                });
+                missionList.innerHTML += categoryHtml;
+            }
+        }
+
+        function switchShopTab(tab) {
+            currentShopTab = tab;
+            document.querySelectorAll('.shop-tab').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            renderShop();
+        }
+
+        function renderShop() {
+            const shopList = document.getElementById('shop-list');
+            shopList.innerHTML = '';
+            
+            const currentList = currentShopTab === 'titles' ? shopTitles : shopFrames;
+
+            currentList.forEach(item => {
+                let btnHtml = '';
+                if(userData.isGuest) {
+                    btnHtml = `<button class="btn-buy" disabled>Đăng ký để mua</button>`;
+                } else {
+                    const isOwned = userData.inventory.includes(item.id);
+                    const isEquipped = (userData.currentTitle === item.id) || (userData.currentFrame === item.id);
+                    
+                    if (isEquipped) btnHtml = `<button class="btn-equipped"><i class="fas fa-check-circle"></i> Đang dùng</button>`;
+                    else if (isOwned) btnHtml = `<button class="btn-equip" onclick="equipItem('${item.id}', '${currentShopTab}')">Trang bị</button>`;
+                    else {
+                        const canAfford = (userData.coins || 0) >= item.price;
+                        btnHtml = `<button class="btn-buy" ${!canAfford ? 'disabled' : ''} onclick="buyItem('${item.id}', ${item.price}, '${currentShopTab}')">Mua ${item.price} <i class="fas fa-coins"></i></button>`;
+                    }
+                }
+
+                let previewHtml = `<div class="title-badge">${item.name}</div>`;
+                if(currentShopTab === 'titles') previewHtml = `<div class="title-badge" style="color: ${item.color}">${item.name}</div>`;
+                else previewHtml = `<div style="width:60px; height:60px; margin: 0 auto 15px; border-radius:50%; background:#111; ${item.style}"></div><div class="title-badge" style="font-size:16px;">${item.name}</div>`;
+
+                shopList.innerHTML += `<div class="shop-item">${previewHtml}${btnHtml}</div>`;
+            });
+        }
+
+        function buyItem(id, price, type) {
+            if(userData.isGuest) return;
+            if(userData.coins >= price) {
+                if(confirm(`Xác nhận mua vật phẩm này với ${price} Xu?`)) {
+                    userData.coins -= price; userData.inventory.push(id);
+                    if(type === 'titles') userData.currentTitle = id; else userData.currentFrame = id;
+                    saveUser(); updateUI(); 
+                }
+            }
+        }
+
+        function equipItem(id, type) { 
+            if(userData.isGuest) return; 
+            if(type === 'titles') userData.currentTitle = id; else userData.currentFrame = id;
+            saveUser(); updateUI(); 
+        }
+
+        function playGame(url, isFreeForGuest = false) {
+            if(userData.isGuest && !isFreeForGuest) { 
+                alert("Tính năng này chỉ dành cho tài khoản chính thức. Vui lòng đăng nhập!"); 
+                return; 
+            }
+            window.location.href = url;
+        }
+
+        function openModal(name, element) { 
+            if (userData.isGuest && (name === 'spin' || name === 'shop')) {
+                alert("Tính năng dành cho người đăng kí!"); return;
+            }
+
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if (element && element.classList) element.classList.add('active');
+            
+            document.getElementById('modal-' + name).classList.add('active'); 
+            updateUI(); 
+        }
+
+        function closeAllModals(element) {
+            document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if (element) { element.classList.add('active'); } 
+            else { document.querySelectorAll('.nav-item')[0].classList.add('active'); }
+        }
+
+        function closeModal(name) { document.getElementById('modal-' + name).classList.remove('active'); closeAllModals(); }
+        
+        function confirmLogout() {
+            if(userData.isGuest) { window.location.href = 'login.html'; return; }
+            if (confirm("Bạn có chắc chắn muốn đăng xuất không?")) {
+                localStorage.removeItem('currentUser'); 
+                window.location.href = 'login.html';
+            } else {
+                closeAllModals();
+            }
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
