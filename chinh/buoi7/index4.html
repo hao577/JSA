@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Cinema Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* --- 1. CẤU HÌNH CHUNG (DARK THEME) --- */
+        :root {
+            --primary-color: #e50914; /* Màu đỏ kiểu Netflix */
+            --bg-color: #141414;
+            --card-bg: #1f1f1f;
+            --text-color: #ffffff;
+            --text-secondary: #b3b3b3;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        /* --- 2. HEADER & SEARCH BAR --- */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            margin-top: 20px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(229, 9, 20, 0.7);
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 15px 20px;
+            border-radius: 50px;
+            border: 2px solid #333;
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 15px rgba(229, 9, 20, 0.3);
+        }
+
+        button {
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: none;
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+        }
+
+        button:hover {
+            background-color: #ff0f1f;
+            transform: scale(1.05);
+        }
+
+        /* --- 3. LƯỚI PHIM (GRID LAYOUT) --- */
+        #resultContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Tự động chia cột */
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        /* --- 4. THẺ PHIM (CARD DESIGN) --- */
+        .movie-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .poster-container {
+            position: relative;
+            overflow: hidden;
+            padding-top: 150%; /* Tỉ lệ khung hình chuẩn poster 2:3 */
+        }
+
+        .poster-container img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Badge điểm số */
+        .rating {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0,0,0,0.8);
+            color: #4cd137; /* Màu xanh lá */
+            padding: 5px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border: 1px solid #4cd137;
+        }
+
+        .movie-info {
+            padding: 15px;
+        }
+
+        .movie-title {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* Cắt bớt tên dài... */
+        }
+
+        .movie-date {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .overview {
+            font-size: 0.8rem;
+            color: #bbb;
+            margin-top: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3; /* Chỉ hiện tối đa 3 dòng */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+
+        /* --- 5. LOADING SPINNER & ERROR --- */
+        .loader {
+            border: 5px solid #333;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 50px auto;
+            display: none; /* Mặc định ẩn */
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .error-msg { text-align: center; color: #ff4757; font-size: 1.2rem; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Cinema Pro</h1>
+        <div class="search-container">
+            <input type="text" id="movieInput" placeholder="Nhập tên phim (VD: Iron Man, Mai)...">
+            <button onclick="searchMovie()">Tìm kiếm</button>
+        </div>
+    </header>
+
+    <div id="loader" class="loader"></div>
+
+    <div id="resultContainer"></div>
+
+    <script>
+        const API_KEY = '2c8608b4aac7a25255e74f72c8b2cf06'; // Key của bạn
+        const IMG_PATH = 'https://image.tmdb.org/t/p/w500';
+
+        async function searchMovie() {
+            const query = document.getElementById('movieInput').value;
+            const container = document.getElementById('resultContainer');
+            const loader = document.getElementById('loader');
+
+            // Reset
+            container.innerHTML = '';
+            
+            if (!query.trim()) {
+                alert("Vui lòng nhập tên phim!");
+                return;
+            }
+
+            // Hiện loading
+            loader.style.display = 'block';
+
+            try {
+                const url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=vi-VN`;
+                
+                const res = await fetch(url);
+                const data = await res.json();
+
+                // Ẩn loading
+                loader.style.display = 'none';
+
+                if (data.results && data.results.length > 0) {
+                    showMovies(data.results);
+                } else {
+                    container.innerHTML = `<p class="error-msg">Không tìm thấy phim nào với tên "${query}" 😢</p>`;
+                }
+
+            } catch (error) {
+                loader.style.display = 'none';
+                container.innerHTML = `<p class="error-msg">Lỗi kết nối! Vui lòng thử lại.</p>`;
+                console.error(error);
+            }
+        }
+
+        function showMovies(movies) {
+            const container = document.getElementById('resultContainer');
+
+            movies.forEach(movie => {
+                // Destructuring để lấy dữ liệu gọn hơn
+                const { title, poster_path, vote_average, overview, release_date } = movie;
+
+                // Tạo thẻ phim
+                const movieEl = document.createElement('div');
+                movieEl.classList.add('movie-card');
+
+                // Xử lý ảnh và điểm số
+                const poster = poster_path ? IMG_PATH + poster_path : "https://via.placeholder.com/500x750?text=No+Image";
+                const rating = vote_average ? vote_average.toFixed(1) : "N/A"; // Làm tròn 1 số lẻ
+                const year = release_date ? release_date.split('-')[0] : "Không rõ"; // Lấy năm
+
+                // Xử lý nội dung tóm tắt (nếu không có tiếng Việt thì báo)
+                const desc = overview ? overview : "Chưa có mô tả cho phim này.";
+
+                movieEl.innerHTML = `
+                    <div class="poster-container">
+                        <img src="${poster}" alt="${title}">
+                        <span class="rating">⭐ ${rating}</span>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title" title="${title}">${title}</h3>
+                        <p class="movie-date">Năm: ${year}</p>
+                        <p class="overview">${desc}</p>
+                    </div>
+                `;
+
+                container.appendChild(movieEl);
+            });
+        }
+
+        // Bắt sự kiện Enter
+        document.getElementById('movieInput').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') searchMovie();
+        })
+    </script>
+</body>
+</html>

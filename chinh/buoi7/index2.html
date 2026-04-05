@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Tìm thông tin bài viết</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f6fc;
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+        }
+
+        .container {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            width: 400px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        input {
+            width: 70%;
+            padding: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 8px 12px;
+            font-size: 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .result {
+            margin-top: 20px;
+        }
+
+        img {
+            width: 150px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🌍 Tìm thông tin bài viết</h2>
+    <input type="text" id="countryInput" placeholder="Nhập tên bài viết">
+    <button onclick="searchCountry()">Tìm</button>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+function searchCountry() {
+    const input = document.getElementById("countryInput").value;
+    const result = document.getElementById("result");
+
+    if (input === "") {
+        result.innerHTML = "<p>⚠️ Vui lòng nhập tên bài viết</p>";
+        return;
+    }
+
+    fetch("https://jsonplaceholder.typicode.com/posts/" + input)
+        .then(response => response.json())
+        .then(data => {
+            const posts = data;
+
+            result.innerHTML = `
+                <h3>${posts.title}</h3>
+                <p><b>ID:</b> ${posts.id}</p>
+                <p><b>User ID:</b> ${posts.userId}</p>
+                <p>title: ${posts.title}</p>
+                <p><b>Nội dung:</b> ${posts.body}</p>
+            `;
+        })
+        .catch(error => {
+            result.innerHTML = "<p>❌ Không tìm thấy bài viết</p>";
+            console.error(error);
+        });
+}
+</script>
+
+</body>
+</html>

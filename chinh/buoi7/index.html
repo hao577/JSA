@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h2>Tạo hồ sơ cá nhân</h2>
+    <button onclick="showUser()">Ấn để xem thông tin</button>
+    <div id="userInfo"></div>
+    <script>
+      function showUser() {
+        let resultDiv = document.getElementById("userInfo");
+        resultDiv.innerHTML = ""; // (khuyến khích) xoá dữ liệu cũ
+
+        const URL_USER = "https://jsonplaceholder.typicode.com/posts";
+        fetch(URL_USER)
+          .then((response) => response.json())
+          .then((users) => {
+            users.forEach((u) => {
+              let div = document.createElement("div");
+              div.innerHTML = `
+                    <p>User ID: ${u.userId}</p>
+                    <p>ID: ${u.id}</p>
+                    <p>Title: ${u.title}</p>
+                    <p>Body: ${u.body}</p>
+                    <hr />
+                `;
+              resultDiv.appendChild(div);
+            });
+          })
+          .catch((error) => {
+            console.error("Error fetching user data:", error);
+          });
+      }
+    </script>
+  </body>
+</html>

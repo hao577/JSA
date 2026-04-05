@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalStorage Form Demo</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: inline-block;
+            width: 60px;
+            font-weight: bold;
+        }
+        input {
+            padding: 5px;
+            width: 200px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 5px 15px;
+            cursor: pointer;
+        }
+        h2 {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Enter Your Information</h2>
+    <form id="userForm">
+        <div class="form-group">
+            <label for="nameInput">Name:</label>
+            <input type="text" id="nameInput" placeholder="Nhập tên của bạn" required>
+        </div>
+        <div class="form-group">
+            <label for="emailInput">Email:</label>
+            <input type="email" id="emailInput" placeholder="Nhập email" required>
+        </div>
+        <button type="submit" id="btnSubmit">Submit</button>
+    </form>
+
+    <div id="displayArea" style="display: none;">
+        <h2>Stored Information:</h2>
+        <p><strong>Name:</strong> <span id="displayName"></span></p>
+        <p><strong>Email:</strong> <span id="displayEmail"></span></p>
+    </div>
+
+    <script>
+        // Lấy các phần tử cần thiết từ DOM
+        const btnSubmit = document.getElementById('btnSubmit');
+        const nameInput = document.getElementById('nameInput');
+        const emailInput = document.getElementById('emailInput');
+        
+        const displayArea = document.getElementById('displayArea');
+        const displayName = document.getElementById('displayName');
+        const displayEmail = document.getElementById('displayEmail');
+
+        // Hàm để hiển thị dữ liệu từ LocalStorage ra màn hình
+        function showStoredData() {
+            // Lấy dữ liệu từ localStorage
+            const storedName = localStorage.getItem('userName');
+            const storedEmail = localStorage.getItem('userEmail');
+
+            // Kiểm tra nếu có dữ liệu thì mới hiển thị
+            if (storedName && storedEmail) {
+                displayName.textContent = storedName;
+                displayEmail.textContent = storedEmail;
+                displayArea.style.display = 'block'; // Hiện khung kết quả
+            }
+        }
+
+        // Gọi hàm hiển thị ngay khi trang web tải xong (để giữ lại thông tin nếu F5)
+        showStoredData();
+
+        // Phần 3: Thêm Event Listener vào nút gửi
+        btnSubmit.addEventListener('click', function(event) {
+            // Ngăn chặn hành vi reload trang mặc định của form
+            event.preventDefault();
+
+            // 1. Thu thập input
+            const nameValue = nameInput.value;
+            const emailValue = emailInput.value;
+
+            // Kiểm tra xem người dùng đã nhập đủ chưa
+            if(nameValue === "" || emailValue === "") {
+                alert("Vui lòng nhập đầy đủ thông tin!");
+                return;
+            }
+
+            // 2. Lưu trữ dữ liệu vào localStorage
+            localStorage.setItem('userName', nameValue);
+            localStorage.setItem('userEmail', emailValue);
+
+            // 3. Lấy dữ liệu đã lưu và hiển thị lên web
+            showStoredData();
+            
+            alert("Đã lưu thông tin thành công!");
+        });
+    </script>
+</body>
+</html>

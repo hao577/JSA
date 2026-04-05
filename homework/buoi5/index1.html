@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo Hồ Sơ Cá Nhân</title>
+    <style>
+        /* CSS để làm đẹp giao diện */
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 900px;
+            display: flex; /* Dùng Flexbox để chia 2 cột */
+            gap: 50px;
+            border: 2px solid #6200ea; /* Viền tím giống ảnh */
+        }
+
+        /* Cột bên trái: Form */
+        .left-column {
+            flex: 1;
+        }
+
+        /* Cột bên phải: Kết quả */
+        .right-column {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #333;
+            font-size: 24px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Để padding không làm vỡ layout */
+            background-color: #f0f2f5;
+        }
+
+        /* Nút Lưu hồ sơ màu xanh lá */
+        .btn-save {
+            width: 100%;
+            padding: 10px;
+            background-color: #689f38;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn-save:hover {
+            background-color: #558b2f;
+        }
+
+        /* Thẻ Profile bên phải */
+        .profile-card {
+            background-color: #e1f5fe; /* Màu xanh nhạt */
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Ảnh đại diện hình tròn */
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            margin-bottom: 15px;
+            background-color: #ddd; /* Màu nền nếu chưa có ảnh */
+        }
+
+        .profile-info p {
+            margin: 8px 0;
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* Nút Chỉnh sửa */
+        .btn-edit {
+            margin-top: 15px;
+            padding: 5px 15px;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="left-column">
+            <h2>Tạo hồ sơ cá nhân</h2>
+            <form id="profileForm">
+                <input type="text" id="name" placeholder="Tên: John" required>
+                <input type="email" id="email" placeholder="Email: test@gmail.com" required>
+                <input type="tel" id="phone" placeholder="Số điện thoại: 0912345678">
+                <input type="text" id="address" placeholder="Địa chỉ: Hanoi">
+                <input type="url" id="avatarUrl" placeholder="Link ảnh (VD: https://picsum.photos/200)">
+                
+                <button type="submit" class="btn-save">Lưu hồ sơ</button>
+            </form>
+        </div>
+
+        <div class="right-column">
+            <div class="profile-card" id="profileCard" style="display: none;">
+                <img src="https://via.placeholder.com/150" alt="Avatar" id="displayAvatar" class="avatar">
+                
+                <div class="profile-info">
+                    <p><strong>Tên:</strong> <span id="displayName"></span></p>
+                    <p><strong>Email:</strong> <span id="displayEmail"></span></p>
+                    <p><strong>Số điện thoại:</strong> <span id="displayPhone"></span></p>
+                    <p><strong>Địa chỉ:</strong> <span id="displayAddress"></span></p>
+                </div>
+
+                <button class="btn-edit" id="btnEdit">Chỉnh sửa hồ sơ</button>
+            </div>
+            <p id="emptyMessage" style="color: #888;">Chưa có thông tin hồ sơ.</p>
+        </div>
+    </div>
+
+    <script>
+        // 1. Lấy các phần tử cần thiết
+        const form = document.getElementById('profileForm');
+        const profileCard = document.getElementById('profileCard');
+        const emptyMessage = document.getElementById('emptyMessage');
+        const btnEdit = document.getElementById('btnEdit');
+
+        // Các trường input
+        const inputs = {
+            name: document.getElementById('name'),
+            email: document.getElementById('email'),
+            phone: document.getElementById('phone'),
+            address: document.getElementById('address'),
+            avatar: document.getElementById('avatarUrl')
+        };
+
+        // Các trường hiển thị
+        const displays = {
+            name: document.getElementById('displayName'),
+            email: document.getElementById('displayEmail'),
+            phone: document.getElementById('displayPhone'),
+            address: document.getElementById('displayAddress'),
+            avatar: document.getElementById('displayAvatar')
+        };
+
+        // 2. Hàm tải dữ liệu từ LocalStorage
+        function loadProfile() {
+            const storedProfile = localStorage.getItem('myProfile');
+            
+            if (storedProfile) {
+                const data = JSON.parse(storedProfile); // Chuyển chuỗi JSON về lại Object
+
+                // Hiển thị dữ liệu ra màn hình bên phải
+                displays.name.textContent = data.name;
+                displays.email.textContent = data.email;
+                displays.phone.textContent = data.phone;
+                displays.address.textContent = data.address;
+                // Nếu có link ảnh thì dùng, không thì dùng ảnh mặc định
+                displays.avatar.src = data.avatar || "https://via.placeholder.com/150";
+
+                // Ẩn thông báo trống, hiện card
+                profileCard.style.display = 'block';
+                emptyMessage.style.display = 'none';
+            }
+        }
+
+        // Gọi hàm load ngay khi vào trang
+        load

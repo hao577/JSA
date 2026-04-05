@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Tìm thông tin quốc gia</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f6fc;
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+        }
+
+        .container {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            width: 400px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        input {
+            width: 70%;
+            padding: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 8px 12px;
+            font-size: 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .result {
+            margin-top: 20px;
+        }
+
+        img {
+            width: 150px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🌍 Tìm thông tin quốc gia</h2>
+    <input type="text" id="countryInput" placeholder="Nhập tên nước">
+    <button onclick="searchCountry()">Tìm</button>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+function searchCountry() {
+    const input = document.getElementById("countryInput").value;
+    const result = document.getElementById("result");
+
+    if (input === "") {
+        result.innerHTML = "<p>⚠️ Vui lòng nhập tên quốc gia</p>";
+        return;
+    }
+
+    fetch("https://restcountries.com/v3.1/name/" + input)
+        .then(response => response.json())
+        .then(data => {
+            const country = data[0];
+
+            result.innerHTML = `
+                <h3>${country.name.common}</h3>
+                <p><b>Dân số:</b> ${country.population.toLocaleString()}</p>
+                <img src="${country.flags.png}" alt="Quốc kỳ">
+            `;
+        })
+        .catch(error => {
+            result.innerHTML = "<p>❌ Không tìm thấy quốc gia</p>";
+            console.error(error);
+        });
+}
+</script>
+
+</body>
+</html>
